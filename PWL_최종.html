@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>스마트 신체부담 작업분석 (Final)</title>
+    <style>
+        :root {
+            --primary: #2980b9;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 15px;
+            line-height: 1.5;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin: 10px 0 5px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #eaeaea;
+        }
+
+        .section-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Age Input Style */
+        .input-wrapper {
+            margin-bottom: 5px;
+        }
+
+        .input-wrapper label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+
+        /* Question Styles (Mobile UI) */
+        .q-item {
+            margin-bottom: 25px;
+        }
+
+        .q-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .q-detail {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .radio-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 5px;
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            height: 100%;
+        }
+
+        .radio-sub {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        input[type="radio"]:checked+.radio-label {
+            background-color: #eaf2f8;
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        /* Button */
+        .btn-analyze {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .btn-analyze:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Area */
+        #resultArea {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .result-header {
+            text-align: center;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .job-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 10px 0;
+            line-height: 1.3;
+        }
+
+        .match-rate {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .score-pill {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .risk-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .risk-alert {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8e8e8;
+            color: #555;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .alert-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🧠 스마트 작업분석 (AI)</h1>
+    <div class="subtitle">자가 기입식 인간공학적 부하 평가</div>
+
+    <div class="card">
+        <div class="section-header">👤 근로자 정보</div>
+        <div class="input-wrapper">
+            <label for="age">연령 (만 나이)</label>
+            <input type="number" id="age" placeholder="예: 45" value="">
+        </div>
+        <div style="font-size:0.8rem; color:#888; margin-top:5px;">
+            * 50세 이상은 가중치가 다르게 적용됩니다.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">✍️ 작업 빈도 체크</div>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
+            하루 작업 시간 중, 각 동작이 차지하는 비중을 선택하세요.
+        </p>
+
+        <form id="ergoForm">
+        </form>
+
+        <button class="btn-analyze" onclick="analyze()">AI 정밀 분석 실행</button>
+    </div>
+
+    <div id="resultArea">
+        <div class="result-header">
+            <div class="match-rate">AI Detected Profile</div>
+            <div class="job-title" id="resTitle">분석 결과</div>
+            <div class="score-row">
+                <div class="score-pill" id="resScore">점수: -</div>
+                <div class="score-pill" id="resLevel">등급: -</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-header">📊 분석 리포트</div>
+
+            <div class="info-box" style="border-left-color: var(--primary);">
+                <span class="info-label">🧐 AI 판단 소견</span>
+                <span id="resReason">-</span>
+            </div>
+
+            <div class="info-box" style="border-left-color: var(--dark);">
+                <span class="info-label">🏭 유사 직종</span>
+                <div id="resExamples">-</div>
+            </div>
+
+            <div class="info-box" style="border-left-color: var(--success);">
+                <span class="info-label">💡 맞춤 개선 권고</span>
+                <span id="resGuide">-</span>
+            </div>
+
+            <div id="criticalAlert" class="alert-box" style="display:none;"></div>
+            <div id="ageAlert" class="alert-box"
+                style="display:none; background:#fffaf0; border-color:#fbd38d; color:#9c4221;"></div>
+        </div>
+
+        <div class="card">
+            <div class="section-header">⚠️ 항목별 위험도</div>
+            <div id="riskList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 질문 데이터
+        const questions = [
+            { id: 'q1', text: "1. 서 있거나 걷기", detail: "장시간 제자리 서기 또는 이동" },
+            { id: 'q2', text: "2. 허리 굽힘/비틀기", detail: "인사하는 자세 또는 회전" },
+            { id: 'q3', text: "3. 어깨 위 팔 들기", detail: "손이 어깨 높이 이상" },
+            { id: 'q4', text: "4. 반복적 팔 동작", detail: "빠른 속도의 손/팔 반복" },
+            { id: 'q5', text: "5. 쪼그려 앉기/무릎 꿇기", detail: "바닥 작업, 무릎 꿇기" },
+            { id: 'q6', text: "6. 밀기 또는 당기기", detail: "카트, 대차, 중량물 견인" },
+            { id: 'q7', text: "7. 물건 들기/운반", detail: "중량물 직접 취급" }
+        ];
+
+        // 2. 선택지 (값 매핑)
+        const options = [
+            { label: "전혀 없음", sub: "0%", val: 0 },
+            { label: "아주 조금", sub: "~10%", val: 12.5 },
+            { label: "가끔", sub: "25%", val: 25 },
+            { label: "반반", sub: "50%", val: 50 },
+            { label: "자주", sub: "75%", val: 75 },
+            { label: "거의 내내", sub: "100%", val: 100 }
+        ];
+
+        // 3. 15가지 정밀 작업 프로필 (Logic Ver 4.0)
+        const profiles = [
+            {
+                id: 'floor_repetitive',
+                name: '🔥 저상 반복/정밀형 (High Risk)',
+                weights: { q1: 10, q2: 60, q3: 30, q4: 100, q5: 100, q6: 0, q7: 20 },
+                examples: ['용접(저상/파이프)', '정밀 사상(Grinding)', '타일 줄눈 시공', '기계 하부 정비'],
+                reason: "쪼그려 앉아 하체 혈류가 제한된 상태(Q5)에서 상지를 과도하게 사용(Q4)하는 최고 위험군입니다.",
+                guide: "무릎 보호대만으로는 부족합니다. 바퀴 달린 작업 의자(Creeper)를 도입해 무릎 굴곡을 없애고, 30분 작업/5분 스트레칭 사이클을 강제해야 합니다."
+            },
+            // ... (나머지 프로필들은 기존 유지, 아래 analyze 함수에서 동적 처리됨) ...
+            { id: 'floor_heavy', name: '🏗️ 저상 중량/설치형', weights: { q1: 20, q2: 90, q3: 20, q4: 30, q5: 100, q6: 20, q7: 80 }, examples: ['타일 운반/부착', '바닥 배관', '조경', '보도블럭'], reason: "바닥 자세(Q5)에서 중량물(Q7)과 허리 힘(Q2)을 동시에 사용하는 요추 고위험군입니다.", guide: "자재를 바닥에 두지 마십시오. 높이 조절 대차(Lift table)를 사용해 허리 굽힘을 원천 차단해야 합니다." },
+            { id: 'confined_space', name: '🕳️ 협소공간/정비형', weights: { q1: 20, q2: 100, q3: 40, q4: 50, q5: 80, q6: 0, q7: 20 }, examples: ['엔진룸', '탱크 내부', '맨홀', '배관 보수'], reason: "좁은 공간 제약으로 몸을 비틀고(Q2) 구부리는(Q5) 자세가 강요됩니다.", guide: "연속 작업 시간을 15분으로 제한하고, 외부 공간에서의 전신 신전(Stretching)을 작업 절차에 포함시키세요." },
+            { id: 'assembly_standing', name: '⚙️ 입식 라인 조립형', weights: { q1: 100, q2: 20, q3: 20, q4: 100, q5: 0, q6: 0, q7: 10 }, examples: ['자동차 의장', '전자제품 포장', '선별 라인'], reason: "장시간 기립(Q1)과 상지 반복(Q4)이 결합된 전형적인 조립 공정입니다.", guide: "작업 높이를 팔꿈치 아래 5~10cm로 조정하고, 입식 의자(Standing stool)와 피로 예방 매트를 동시에 지급하세요." },
+            { id: 'overhead_static', name: '🎨 상향/고소 정밀형', weights: { q1: 80, q2: 40, q3: 100, q4: 80, q5: 0, q6: 0, q7: 10 }, examples: ['천장 도장', '전등/배선', '덕트 설치', '차량 하부'], reason: "어깨 위 작업(Q3)과 반복 동작(Q4)은 회전근개 손상의 직접적 원인입니다.", guide: "목 젖힘 방지 프리즘 안경과 팔 지지대(Exoskeleton) 도입이 시급합니다." },
+            { id: 'heavy_logistic', name: '📦 동적 물류/하역형', weights: { q1: 100, q2: 50, q3: 10, q4: 20, q5: 10, q6: 30, q7: 100 }, examples: ['상하차', '곰방', '이사짐', '자재 적재'], reason: "이동(Q1)과 고중량 취급(Q7)이 결합된 전신 근육 소모형 작업입니다.", guide: "허리 회전(Twisting)을 금지하고 발을 움직여 방향을 전환하세요. 파워 그립 장갑 착용 필수." },
+            { id: 'push_pull_cart', name: '🛒 중량 견인형', weights: { q1: 90, q2: 30, q3: 0, q4: 0, q5: 0, q6: 100, q7: 20 }, examples: ['대차 운반', '환자 이송', '롤테이너'], reason: "과도한 미는 힘(Q6)에 의한 어깨 및 요추 부담 패턴입니다.", guide: "바퀴 유지보수를 최우선으로 하고, 초기 기동 시 체중을 실어 미는 교육을 실시하세요." },
+            { id: 'precision_sedentary', name: '🔬 좌식 정밀/검사형', weights: { q1: 0, q2: 40, q3: 20, q4: 100, q5: 0, q6: 0, q7: 0 }, examples: ['미싱', 'PCB 납땜', '현미경 검사'], reason: "좌식 정적 자세와 손가락 반복 동작(Q4)이 결합되었습니다.", guide: "팔꿈치 받침대(Arm rest) 설치 및 50분 작업/10분 스트레칭 준수." },
+            { id: 'standing_guard', name: '👮 입식 감시/서비스형', weights: { q1: 100, q2: 0, q3: 0, q4: 10, q5: 0, q6: 0, q7: 0 }, examples: ['보안', '안내', '교통 정리'], reason: "움직임 없는 기립 자세(Q1)로 인한 하지 정맥류 위험군입니다.", guide: "발판(Foot rest)을 두어 체중을 이동시키고, 압박 스타킹 착용을 권장합니다." },
+            { id: 'construction_general', name: '🧱 건설/복합 고강도형', weights: { q1: 80, q2: 80, q3: 60, q4: 40, q5: 60, q6: 40, q7: 80 }, examples: ['형틀', '철근', '비계', '석공'], reason: "신체 전반의 에너지 소모가 극심한 복합 고강도 작업입니다.", guide: "작업 강도에 따른 철저한 휴게 시간 보장 및 작업 순환(Job Rotation) 실시." },
+            { id: 'patient_care', name: '🏥 복합 돌봄/간호형', weights: { q1: 75, q2: 75, q3: 0, q4: 25, q5: 25, q6: 50, q7: 50 }, examples: ['간호사', '요양보호사'], reason: "환자 이송 시 발생하는 돌발적인 부하와 비틀림(Q2)이 위험 요인입니다.", guide: "슬라이딩 시트 등 보조 도구 사용을 의무화하고, 침대 높이를 허리 높이로 맞추세요." },
+            { id: 'driver', name: '🚛 운전/진동형', weights: { q1: 0, q2: 50, q3: 0, q4: 0, q5: 0, q6: 0, q7: 20 }, examples: ['화물 운전', '지게차'], reason: "장시간 좌식 자세에서의 진동 노출과 허리 부담이 핵심입니다.", guide: "공기압 서스펜션 시트 적용 및 2시간마다 하차하여 스트레칭 필수." },
+            { id: 'office_admin', name: '💻 일반 사무/관리형', weights: { q1: 10, q2: 0, q3: 0, q4: 20, q5: 0, q6: 0, q7: 0 }, examples: ['사무', '설계', '콜센터'], reason: "신체적 부하는 적으나 VDT 증후군 예방이 필요합니다.", guide: "모니터 상단을 눈높이에 맞추고, 의자 깊숙이 앉는 습관을 들이세요." },
+            { id: 'active_mobile', name: '🏃 활동적 이동형', weights: { q1: 100, q2: 0, q3: 0, q4: 0, q5: 0, q6: 0, q7: 50 }, examples: ['배달', '검침', '서빙'], reason: "높은 이동량(Q1)에 의한 하지 피로 누적이 주된 문제입니다.", guide: "충격 흡수 작업화(워킹화) 지급 및 휴식 시 다리를 높게 올리세요." }
+        ];
+
+        // 4. UI 렌더링
+        function renderForm() {
+            const form = document.getElementById('ergoForm');
+            let html = '';
+
+            questions.forEach(q => {
+                html += `
+                <div class="q-item">
+                    <div class="q-title">${q.text}</div>
+                    <div class="q-detail">${q.detail}</div>
+                    <div class="radio-group">
+                        ${options.map((opt, idx) => `
+                            <label>
+                                <input type="radio" name="${q.id}" value="${opt.val}">
+                                <div class="radio-label">
+                                    <span>${opt.label}</span>
+                                    <div class="radio-sub">${opt.sub}</div>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            });
+            form.innerHTML = html;
+        }
+
+        // 5. 핵심 분석 함수 (AI Logic)
+        function analyze() {
+            // A. 입력값 검증 및 데이터 수집
+            const ageVal = document.getElementById('age').value;
+            if (!ageVal) { alert('정확한 분석을 위해 연령을 입력해주세요.'); document.getElementById('age').focus(); return; }
+            const age = parseInt(ageVal);
+
+            const userScores = {};
+            let totalScore = 0;
+            let allChecked = true;
+
+            questions.forEach(q => {
+                const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+                if (!checked) allChecked = false;
+                else {
+                    userScores[q.id] = parseFloat(checked.value);
+                    totalScore += userScores[q.id];
+                }
+            });
+
+            if (!allChecked) { alert('모든 항목을 선택해주세요.'); return; }
+
+            // B. Index 계산
+            const ergoIndex = (totalScore / 7).toFixed(1);
+
+            // C. 프로필 매칭 (Weighted Distance)
+            let bestMatch = null;
+            let minDiff = Infinity;
+
+            profiles.forEach(prof => {
+                let diffSum = 0;
+                for (let key in prof.weights) {
+                    let w = prof.weights[key];
+                    let u = userScores[key];
+                    // 가중치: 쪼그려 앉기(Q5)와 반복(Q4)의 중요도 강화
+                    let factor = 1;
+                    if (key === 'q5' && w >= 80) factor = 2.5;
+                    if (key === 'q4' && w >= 80) factor = 1.5;
+                    diffSum += Math.pow((u - w) * factor, 2);
+                }
+                if (diffSum < minDiff) { minDiff = diffSum; bestMatch = prof; }
+            });
+
+            // 강제 보정 로직 (저상 작업 우선)
+            if (userScores.q5 >= 70 && !bestMatch.id.includes('floor') && !bestMatch.id.includes('confined')) {
+                let floorProfiles = profiles.filter(p => p.id.includes('floor') || p.id.includes('confined'));
+                let subMin = Infinity;
+                floorProfiles.forEach(p => {
+                    let d = 0;
+                    for (let k in p.weights) d += Math.pow(userScores[k] - p.weights[k], 2);
+                    if (d < subMin) { subMin = d; bestMatch = p; }
+                });
+            }
+
+            // =========================================================================
+            // ★ [핵심 수정] 동적 복합 처방 생성기 (Dynamic Compound Prescription) ★
+            // =========================================================================
+
+            let finalGuide = bestMatch.guide; // 기본값은 프로필의 가이드
+            let finalReason = bestMatch.reason;
+
+            // [시나리오 1] 질문자님 케이스: 반복(Q4) High + 쪼그려 앉기(Q5) High
+            // 기준: 둘 다 50% 이상 (75%면 당연히 포함됨)
+            if (userScores.q4 >= 50 && userScores.q5 >= 50) {
+                // 전문가 코멘트로 덮어쓰기 (HTML 태그 활용하여 강조)
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 복합 처방] 하지 고정 + 상지 반복</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>엔지니어링 개선(필수):</strong> 쪼그려 앉은 상태의 반복 작업은 근골격계 손상을 가속화합니다. <u>바퀴 달린 낮은 의자(Creeper Seat)</u>를 반드시 도입하여 무릎을 펴고 작업해야 합니다.</li>
+                    <li><strong>작업물 높이 조절:</strong> 하체가 고정되면 상체 가동범위가 줄어듭니다. 작업물을 지면에서 <u>30cm 이상 띄우는 지그(Jig)</u>를 사용하십시오.</li>
+                    <li><strong>관리적 조치:</strong> 이 작업은 연속 45분을 넘길 수 없습니다. 타 작업과 순환(Rotation)하거나 강제 휴식을 부여하세요.</li>
+                </ul>
+            `;
+                // 판단 근거도 복합적으로 수정
+                finalReason = `<strong>[복합 위험]</strong> 부자연스러운 하체 자세(Q5: ${userScores.q5}%)와 고반복 상지 작업(Q4: ${userScores.q4}%)이 결합되었습니다. 혈류 제한과 근피로 누적이 동시에 발생하여 단독 위험보다 훨씬 치명적입니다.`;
+            }
+
+            // [시나리오 2] 중량물(Q7) High + 허리 굽힘(Q2) High (또 다른 고위험 패턴)
+            else if (userScores.q7 >= 50 && userScores.q2 >= 50) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 중량물 취급 + 부적절 자세</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>장비 도입:</strong> 허리를 굽힌 채 힘을 쓰는 동작은 디스크 파열 위험이 높습니다. <u>높이 조절형 대차(Lift Table)</u>를 사용하여 허리 굽힘을 0으로 만드세요.</li>
+                    <li><strong>동작 원칙:</strong> 물건을 몸에 최대한 밀착시키고, 허리 회전 대신 발을 움직여 방향을 전환하세요.</li>
+                </ul>
+            `;
+                finalReason = `<strong>[LBI 고위험]</strong> 허리를 굽힌 상태(Q2)에서 중량물 부하(Q7)가 가해져 척추 디스크 압력이 허용 한계를 초과할 가능성이 높습니다.`;
+            }
+
+            // [시나리오 3] 어깨 위(Q3) High + 반복(Q4) High
+            else if (userScores.q3 >= 50 && userScores.q4 >= 50) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 어깨 위 작업 + 반복 동작</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>자세 개선:</strong> 작업 발판을 높이거나 작업물을 낮추어 손의 위치를 <u>어깨 아래(심장 높이)</u>로 조정하는 것이 최우선입니다.</li>
+                    <li><strong>보조구 활용:</strong> 개선이 어렵다면 팔의 무게를 지탱해주는 <u>웨어러블 슈트(Exoskeleton)</u> 도입을 검토하세요.</li>
+                </ul>
+            `;
+                finalReason = `<strong>[회전근개 주의]</strong> 팔을 들고 있는 정적 부하(Q3)에 반복 동작(Q4)이 더해져 어깨 건(Tendon)의 마모가 가속화됩니다.`;
+            }
+
+
+            // E. 결과 출력 (수정된 finalGuide, finalReason 적용)
+            document.getElementById('resTitle').innerText = bestMatch.name;
+            document.getElementById('resReason').innerHTML = finalReason; // innerHTML로 변경 (태그 적용)
+
+            let tags = '';
+            bestMatch.examples.forEach(ex => tags += `<span class="tag">${ex}</span>`);
+            document.getElementById('resExamples').innerHTML = tags;
+
+            document.getElementById('resGuide').innerHTML = finalGuide; // innerHTML로 변경
+
+            // 점수 및 등급 표시
+            document.getElementById('resScore').innerText = `점수: ${ergoIndex}`;
+            let levelText = "", levelColor = "";
+            if (ergoIndex <= 10) { levelText = "낮음 (Low)"; levelColor = "#27ae60"; }
+            else if (ergoIndex <= 20) { levelText = "보통 (Mod)"; levelColor = "#f39c12"; }
+            else if (ergoIndex <= 30) { levelText = "높음 (High)"; levelColor = "#d35400"; }
+            else { levelText = "매우 높음"; levelColor = "#c0392b"; }
+
+            const lvlEl = document.getElementById('resLevel');
+            lvlEl.innerText = `등급: ${levelText}`;
+            lvlEl.style.backgroundColor = levelColor;
+            lvlEl.style.color = "white";
+
+            // 위험 리스트 출력
+            const riskList = document.getElementById('riskList');
+            riskList.innerHTML = '';
+            questions.forEach(q => {
+                const val = userScores[q.id];
+                let threshold = 25;
+                if (q.id === 'q1') threshold = 50;
+                if (['q5', 'q6', 'q7'].includes(q.id)) threshold = 12.5;
+
+                if (val >= threshold) {
+                    riskList.innerHTML += `
+                    <div class="risk-item">
+                        <span>${q.text.split('.')[1]}</span>
+                        <span class="risk-alert">${val}% (주의)</span>
+                    </div>
+                `;
+                }
+            });
+
+            // 연령 경고
+            const ageAlert = document.getElementById('ageAlert');
+            if (age >= 50 && ergoIndex > 10) {
+                ageAlert.style.display = 'block';
+                ageAlert.innerHTML = `⚠️ <strong>연령 경고 (${age}세):</strong> 50세 이상은 현재 작업 강도에서 회복력이 저하되어 병가 위험이 2배 높습니다. 휴식 시간을 늘리세요.`;
+            } else {
+                ageAlert.style.display = 'none';
+            }
+
+            // 중요: criticalAlert은 위 복합 처방 로직에 통합되었으므로 숨김 처리 (중복 방지)
+            document.getElementById('criticalAlert').style.display = 'none';
+
+            // 화면 이동
+            document.getElementById('resultArea').style.display = 'block';
+            setTimeout(() => { document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' }); }, 100);
+        }
+
+        // 초기화
+        renderForm();
+
+    </script>
+</body>
+</html>

@@ -274,6 +274,17 @@
         </div>
     </div>
 
+    <div class="card" style="border-left: 4px solid #e67e22;">
+        <div class="section-header" style="color: #d35400;">⏱️ 작업 속도 및 시간 압박</div>
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 5px 0;">
+            <input type="checkbox" id="timePressure" style="width: 24px; height: 24px; margin-top: 2px;">
+            <div style="font-size: 0.95rem; color: #333;">
+                <strong style="display:block;">당신의 작업은 속도가 빠르거나 시간 압박(Time pressure)이 심합니까?</strong>
+                <span style="font-size: 0.8rem; color: #7f8c8d;">* 사회심리학적 요인은 신체부하를 10~15% 이상 증폭시킵니다.</span>
+            </div>
+        </label>
+    </div>
+
     <div class="card">
         <div class="section-header">✍️ 작업 빈도 체크</div>
         <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
@@ -353,16 +364,16 @@
                 id: 'floor_repetitive',
                 name: '🔥 저상 반복/정밀형 (High Risk)',
                 weights: { q1: 10, q2: 60, q3: 30, q4: 100, q5: 100, q6: 0, q7: 20 },
-                examples: ['용접(저상/파이프)', '정밀 사상(Grinding)', '타일 줄눈 시공', '기계 하부 정비'],
+                examples: ['용접(저상/파이프)', '정밀 사상(Grinding)', '타일 줄눈 시공', '기계 하부 정비', '건물 청소'],
                 reason: "쪼그려 앉아 하체 혈류가 제한된 상태(Q5)에서 상지를 과도하게 사용(Q4)하는 최고 위험군입니다.",
                 guide: "무릎 보호대만으로는 부족합니다. 바퀴 달린 작업 의자(Creeper)를 도입해 무릎 굴곡을 없애고, 30분 작업/5분 스트레칭 사이클을 강제해야 합니다."
             },
             // ... (나머지 프로필들은 기존 유지, 아래 analyze 함수에서 동적 처리됨) ...
             { id: 'floor_heavy', name: '🏗️ 저상 중량/설치형', weights: { q1: 20, q2: 90, q3: 20, q4: 30, q5: 100, q6: 20, q7: 80 }, examples: ['타일 운반/부착', '바닥 배관', '조경', '보도블럭'], reason: "바닥 자세(Q5)에서 중량물(Q7)과 허리 힘(Q2)을 동시에 사용하는 요추 고위험군입니다.", guide: "자재를 바닥에 두지 마십시오. 높이 조절 대차(Lift table)를 사용해 허리 굽힘을 원천 차단해야 합니다." },
             { id: 'confined_space', name: '🕳️ 협소공간/정비형', weights: { q1: 20, q2: 100, q3: 40, q4: 50, q5: 80, q6: 0, q7: 20 }, examples: ['엔진룸', '탱크 내부', '맨홀', '배관 보수'], reason: "좁은 공간 제약으로 몸을 비틀고(Q2) 구부리는(Q5) 자세가 강요됩니다.", guide: "연속 작업 시간을 15분으로 제한하고, 외부 공간에서의 전신 신전(Stretching)을 작업 절차에 포함시키세요." },
-            { id: 'assembly_standing', name: '⚙️ 입식 라인 조립형', weights: { q1: 100, q2: 20, q3: 20, q4: 100, q5: 0, q6: 0, q7: 10 }, examples: ['자동차 의장', '전자제품 포장', '선별 라인'], reason: "장시간 기립(Q1)과 상지 반복(Q4)이 결합된 전형적인 조립 공정입니다.", guide: "작업 높이를 팔꿈치 아래 5~10cm로 조정하고, 입식 의자(Standing stool)와 피로 예방 매트를 동시에 지급하세요." },
+            { id: 'assembly_standing', name: '⚙️ 입식 라인 조립형', weights: { q1: 100, q2: 20, q3: 20, q4: 100, q5: 0, q6: 0, q7: 10 }, examples: ['자동차 의장', '전자제품 포장', '선별 라인', '미용사', '요리/제빵'], reason: "장시간 기립(Q1)과 상지 반복(Q4)이 결합된 전형적인 조립 공정입니다.", guide: "작업 높이를 팔꿈치 아래 5~10cm로 조정하고, 입식 의자(Standing stool)와 피로 예방 매트를 동시에 지급하세요." },
             { id: 'overhead_static', name: '🎨 상향/고소 정밀형', weights: { q1: 80, q2: 40, q3: 100, q4: 80, q5: 0, q6: 0, q7: 10 }, examples: ['천장 도장', '전등/배선', '덕트 설치', '차량 하부'], reason: "어깨 위 작업(Q3)과 반복 동작(Q4)은 회전근개 손상의 직접적 원인입니다.", guide: "목 젖힘 방지 프리즘 안경과 팔 지지대(Exoskeleton) 도입이 시급합니다." },
-            { id: 'heavy_logistic', name: '📦 동적 물류/하역형', weights: { q1: 100, q2: 50, q3: 10, q4: 20, q5: 10, q6: 30, q7: 100 }, examples: ['상하차', '곰방', '이사짐', '자재 적재'], reason: "이동(Q1)과 고중량 취급(Q7)이 결합된 전신 근육 소모형 작업입니다.", guide: "허리 회전(Twisting)을 금지하고 발을 움직여 방향을 전환하세요. 파워 그립 장갑 착용 필수." },
+            { id: 'heavy_logistic', name: '📦 동적 물류/하역형', weights: { q1: 100, q2: 50, q3: 10, q4: 20, q5: 10, q6: 30, q7: 100 }, examples: ['상하차', '곰방', '이사짐', '자재 적재','정육/도축'], reason: "이동(Q1)과 고중량 취급(Q7)이 결합된 전신 근육 소모형 작업입니다.", guide: "허리 회전(Twisting)을 금지하고 발을 움직여 방향을 전환하세요. 파워 그립 장갑 착용 필수." },
             { id: 'push_pull_cart', name: '🛒 중량 견인형', weights: { q1: 90, q2: 30, q3: 0, q4: 0, q5: 0, q6: 100, q7: 20 }, examples: ['대차 운반', '환자 이송', '롤테이너'], reason: "과도한 미는 힘(Q6)에 의한 어깨 및 요추 부담 패턴입니다.", guide: "바퀴 유지보수를 최우선으로 하고, 초기 기동 시 체중을 실어 미는 교육을 실시하세요." },
             { id: 'precision_sedentary', name: '🔬 좌식 정밀/검사형', weights: { q1: 0, q2: 40, q3: 20, q4: 100, q5: 0, q6: 0, q7: 0 }, examples: ['미싱', 'PCB 납땜', '현미경 검사'], reason: "좌식 정적 자세와 손가락 반복 동작(Q4)이 결합되었습니다.", guide: "팔꿈치 받침대(Arm rest) 설치 및 50분 작업/10분 스트레칭 준수." },
             { id: 'standing_guard', name: '👮 입식 감시/서비스형', weights: { q1: 100, q2: 0, q3: 0, q4: 10, q5: 0, q6: 0, q7: 0 }, examples: ['보안', '안내', '교통 정리'], reason: "움직임 없는 기립 자세(Q1)로 인한 하지 정맥류 위험군입니다.", guide: "발판(Foot rest)을 두어 체중을 이동시키고, 압박 스타킹 착용을 권장합니다." },
@@ -422,8 +433,25 @@
 
             if (!allChecked) { alert('모든 항목을 선택해주세요.'); return; }
 
-            // B. Index 계산
-            const ergoIndex = (totalScore / 7).toFixed(1);
+            // B. Index 계산 (기본값)
+            let baseIndex = (totalScore / 7);
+            let ergoIndex = baseIndex;
+
+            // ★ 새로 추가: 시간 압박 가중치 (Multiplier) 적용 ★
+            const hasTimePressure = document.getElementById('timePressure').checked;
+            let timePressureWarning = "";
+            
+            if (hasTimePressure) {
+                ergoIndex = baseIndex * 1.15; // 시간 압박 시 지수 15% 증폭
+                timePressureWarning = `
+                    <div style="margin-top:10px; padding:10px; background:#fff3cd; border:1px solid #ffeeba; border-radius:6px; color:#856404; font-size:0.85rem;">
+                        <strong>⏱️ 시간 압박(Time Pressure) 경고:</strong><br>
+                        빠른 작업 속도로 인해 근육 긴장도가 높아지고 휴식(미세 회복)이 부족한 상태입니다. 신체적 부하 점수에 15%의 가중치가 적용되었습니다.
+                    </div>`;
+            }
+            
+            // 소수점 1자리로 정리
+            ergoIndex = ergoIndex.toFixed(1);
 
             // C. 프로필 매칭 (Weighted Distance)
             let bestMatch = null;
@@ -504,7 +532,7 @@
 
             // E. 결과 출력 (수정된 finalGuide, finalReason 적용)
             document.getElementById('resTitle').innerText = bestMatch.name;
-            document.getElementById('resReason').innerHTML = finalReason; // innerHTML로 변경 (태그 적용)
+            document.getElementById('resReason').innerHTML = finalReason + timePressureWarning; // ★ 시간 압박 경고 메시지 병합
 
             let tags = '';
             bestMatch.examples.forEach(ex => tags += `<span class="tag">${ex}</span>`);
@@ -567,4 +595,3 @@
     </script>
 </body>
 </html>
-

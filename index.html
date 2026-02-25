@@ -483,52 +483,95 @@
             }
 
             // =========================================================================
-            // ★ [핵심 수정] 동적 복합 처방 생성기 (Dynamic Compound Prescription) ★
+            // ★ [핵심 수정] 7대 동적 복합 처방 매트릭스 (Dynamic Compound Prescription) ★
             // =========================================================================
 
-            let finalGuide = bestMatch.guide; // 기본값은 프로필의 가이드
+            let finalGuide = bestMatch.guide;
             let finalReason = bestMatch.reason;
+            let compoundDetected = false;
 
-            // [시나리오 1] 질문자님 케이스: 반복(Q4) High + 쪼그려 앉기(Q5) High
-            // 기준: 둘 다 50% 이상 (75%면 당연히 포함됨)
-            if (userScores.q4 >= 50 && userScores.q5 >= 50) {
-                // 전문가 코멘트로 덮어쓰기 (HTML 태그 활용하여 강조)
+            // [우선순위 1] 허리 굽힘(Q2) + 중량물 들기(Q7) => 요추 디스크 파열 최고위험군
+            if (userScores.q7 >= 50 && userScores.q2 >= 50) {
                 finalGuide = `
-                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 복합 처방] 하지 고정 + 상지 반복</div>
+                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 처방] 부적절한 자세의 중량물 취급 (LBI 고위험)</div>
                 <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>엔지니어링 개선(필수):</strong> 쪼그려 앉은 상태의 반복 작업은 근골격계 손상을 가속화합니다. <u>바퀴 달린 낮은 의자(Creeper Seat)</u>를 반드시 도입하여 무릎을 펴고 작업해야 합니다.</li>
-                    <li><strong>작업물 높이 조절:</strong> 하체가 고정되면 상체 가동범위가 줄어듭니다. 작업물을 지면에서 <u>30cm 이상 띄우는 지그(Jig)</u>를 사용하십시오.</li>
-                    <li><strong>관리적 조치:</strong> 이 작업은 연속 45분을 넘길 수 없습니다. 타 작업과 순환(Rotation)하거나 강제 휴식을 부여하세요.</li>
-                </ul>
-            `;
-                // 판단 근거도 복합적으로 수정
-                finalReason = `<strong>[복합 위험]</strong> 부자연스러운 하체 자세(Q5: ${userScores.q5}%)와 고반복 상지 작업(Q4: ${userScores.q4}%)이 결합되었습니다. 혈류 제한과 근피로 누적이 동시에 발생하여 단독 위험보다 훨씬 치명적입니다.`;
+                    <li><strong>장비 도입:</strong> 허리를 굽힌 상태의 중량물 취급은 요추 디스크 압력을 한계치 이상으로 높입니다. <u>높이 조절형 대차(Lift Table)나 리프트</u>를 반드시 도입하십시오.</li>
+                    <li><strong>동작 원칙:</strong> 물건을 몸에 최대한 밀착시키고, 허리 회전(Twisting) 대신 발을 움직여 방향을 전환해야 합니다.</li>
+                </ul>`;
+                finalReason = `<strong>[요추 고위험]</strong> 허리 굽힘/비틀림(Q2: ${userScores.q2}%)과 중량물 취급(Q7: ${userScores.q7}%)이 결합되어 척추 손상 위험이 극대화되었습니다.`;
+                compoundDetected = true;
             }
 
-            // [시나리오 2] 중량물(Q7) High + 허리 굽힘(Q2) High (또 다른 고위험 패턴)
-            else if (userScores.q7 >= 50 && userScores.q2 >= 50) {
+            // [우선순위 2] 쪼그려 앉기(Q5) + 상지 반복(Q4) => 질문자님 케이스 (용접, 사상, 청소)
+            else if (userScores.q5 >= 50 && userScores.q4 >= 50) {
                 finalGuide = `
-                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 중량물 취급 + 부적절 자세</div>
+                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 처방] 하지 고정 + 상지 고반복</div>
                 <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>장비 도입:</strong> 허리를 굽힌 채 힘을 쓰는 동작은 디스크 파열 위험이 높습니다. <u>높이 조절형 대차(Lift Table)</u>를 사용하여 허리 굽힘을 0으로 만드세요.</li>
-                    <li><strong>동작 원칙:</strong> 물건을 몸에 최대한 밀착시키고, 허리 회전 대신 발을 움직여 방향을 전환하세요.</li>
-                </ul>
-            `;
-                finalReason = `<strong>[LBI 고위험]</strong> 허리를 굽힌 상태(Q2)에서 중량물 부하(Q7)가 가해져 척추 디스크 압력이 허용 한계를 초과할 가능성이 높습니다.`;
+                    <li><strong>엔지니어링 개선:</strong> 하체 혈류가 차단된 상태의 반복 작업은 전신 피로를 급증시킵니다. <u>바퀴 달린 작업 의자(Creeper Seat)</u>를 도입해 무릎 굴곡을 없애야 합니다.</li>
+                    <li><strong>작업물 조정:</strong> 작업물을 지면에서 30cm 이상 띄우는 지그(Jig)를 사용하고, 45분 작업 후 10분 기립 휴식을 강제하십시오.</li>
+                </ul>`;
+                finalReason = `<strong>[복합 피로]</strong> 부자연스러운 하체 자세(Q5: ${userScores.q5}%)와 고반복 상지 작업(Q4: ${userScores.q4}%)이 결합되어 근피로 누적이 단독 요인보다 훨씬 빠릅니다.`;
+                compoundDetected = true;
             }
 
-            // [시나리오 3] 어깨 위(Q3) High + 반복(Q4) High
+            // [우선순위 3] 어깨 위 작업(Q3) + 상지 반복(Q4) => 회전근개 파열 / 어깨 충돌 증후군
             else if (userScores.q3 >= 50 && userScores.q4 >= 50) {
                 finalGuide = `
-                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 어깨 위 작업 + 반복 동작</div>
+                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 어깨 위 정적 자세 + 동적 반복</div>
                 <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>자세 개선:</strong> 작업 발판을 높이거나 작업물을 낮추어 손의 위치를 <u>어깨 아래(심장 높이)</u>로 조정하는 것이 최우선입니다.</li>
-                    <li><strong>보조구 활용:</strong> 개선이 어렵다면 팔의 무게를 지탱해주는 <u>웨어러블 슈트(Exoskeleton)</u> 도입을 검토하세요.</li>
-                </ul>
-            `;
-                finalReason = `<strong>[회전근개 주의]</strong> 팔을 들고 있는 정적 부하(Q3)에 반복 동작(Q4)이 더해져 어깨 건(Tendon)의 마모가 가속화됩니다.`;
+                    <li><strong>자세 개선:</strong> 작업 발판을 높이거나 작업물을 낮추어 손의 위치를 <u>심장 높이 아래</u>로 조정하는 것이 최우선입니다.</li>
+                    <li><strong>보조구 활용:</strong> 공구의 무게가 더해진다면 팔을 지탱해주는 <u>웨어러블 슈트(Exoskeleton)나 툴 발란서</u>를 설치하십시오.</li>
+                </ul>`;
+                finalReason = `<strong>[어깨 고위험]</strong> 팔을 들고 있는 정적 부하(Q3: ${userScores.q3}%)에 반복 동작(Q4: ${userScores.q4}%)이 더해져 어깨 건(Tendon)의 마모가 가속화됩니다.`;
+                compoundDetected = true;
             }
 
+            // [우선순위 4] 밀기/당기기(Q6) + 허리 굽힘/비틀기(Q2) => 대차 운반 시 허리 손상
+            else if (userScores.q6 >= 50 && userScores.q2 >= 50) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 비대칭 견인/대차 작업</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>작업 방식:</strong> 카트를 당기지 말고 <u>진행 방향을 보며 미는(Pushing) 방식</u>으로 전환하여 허리 비틀림을 방지하십시오.</li>
+                    <li><strong>장비 점검:</strong> 바퀴의 구름 저항이 높을수록 허리 부하가 급증합니다. 바퀴 베어링 교체 및 바닥 평탄화 작업이 시급합니다.</li>
+                </ul>`;
+                finalReason = `<strong>[요추 전단력]</strong> 무거운 것을 밀고 당기면서(Q6: ${userScores.q6}%) 허리를 비트는(Q2: ${userScores.q2}%) 동작은 척추에 치명적인 전단력(Shear force)을 발생시킵니다.`;
+                compoundDetected = true;
+            }
+
+            // [우선순위 5] 서 있기(Q1) + 허리 굽힘(Q2) => 정적 굽힘 (가장 흔한 요통 원인: 컨베이어 작업, 다림질 등)
+            else if (userScores.q1 >= 75 && userScores.q2 >= 50) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 장시간 기립 + 정적 허리 굽힘</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>환경 개선:</strong> 허리를 굽히게 만드는 원인(작업대 높이 낮음 등)을 찾아 <u>작업대 높이를 작업자 팔꿈치 수준으로 상향</u> 조정하십시오.</li>
+                    <li><strong>보조 도구:</strong> 입식 의자(Standing stool)와 피로 예방 매트를 설치하고, 한 발을 올릴 수 있는 발판(Foot rest)을 제공하세요.</li>
+                </ul>`;
+                finalReason = `<strong>[척추 기립근 피로]</strong> 서 있는 상태(Q1: ${userScores.q1}%)에서 지속적으로 허리를 숙이는(Q2: ${userScores.q2}%) 정적 자세는 척추 기립근에 허혈성 통증을 유발합니다.`;
+                compoundDetected = true;
+            }
+
+            // [우선순위 6] 허리 굽힘(Q2) + 상지 반복(Q4) => 숙인 채로 손을 쓰는 작업 (청소, 낮은 곳 정비 등)
+            else if (userScores.q2 >= 50 && userScores.q4 >= 50) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 상체 전방 굴곡 + 손/팔 반복</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>도구 연장:</strong> 허리를 굽히지 않고도 작업할 수 있도록 <u>손잡이가 긴 도구(Long-handled tools)</u>로 교체하십시오.</li>
+                    <li><strong>작업물 이동:</strong> 가능하다면 작업물을 바닥이나 낮은 곳에서 허리 높이의 작업대로 올려놓고 작업해야 합니다.</li>
+                </ul>`;
+                finalReason = `<strong>[복합 긴장]</strong> 상체를 숙여 무게중심이 무너진 상태(Q2)에서 팔을 반복적으로 움직이면(Q4) 등과 목의 근육에 지속적인 긴장이 발생합니다.`;
+                compoundDetected = true;
+            }
+
+            // [우선순위 7] 장시간 기립(Q1) + 상지 반복(Q4) => 전형적인 라인 작업 (제조조립, 미용사, 제빵)
+            else if (userScores.q1 >= 75 && userScores.q4 >= 75 && !compoundDetected) {
+                finalGuide = `
+                <div style="margin-bottom:8px; color:#f39c12; font-weight:bold;">⚡ [처방] 정적 기립 + 고빈도 반복</div>
+                <ul style="margin:0; padding-left:20px; color:#333;">
+                    <li><strong>피로 관리:</strong> 하지 정맥류와 손목 건초염이 동시에 발생할 수 있습니다. 피로 예방 매트를 깔고 손목/팔꿈치 지지대를 제공하십시오.</li>
+                    <li><strong>스트레칭:</strong> 1시간마다 손목 털기와 하체 스트레칭을 병행해야 합니다.</li>
+                </ul>`;
+                // 이유(Reason)는 기본 프로필(예: 입식 조립형)의 설명을 그대로 쓰되 가이드만 보강
+            }
 
             // E. 결과 출력 (수정된 finalGuide, finalReason 적용)
             document.getElementById('resTitle').innerText = bestMatch.name;
@@ -595,3 +638,4 @@
     </script>
 </body>
 </html>
+

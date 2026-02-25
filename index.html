@@ -365,23 +365,23 @@
                 name: '🔥 저상 반복/정밀형 (High Risk)',
                 weights: { q1: 10, q2: 60, q3: 30, q4: 100, q5: 100, q6: 0, q7: 20 },
                 examples: ['용접(저상/파이프)', '정밀 사상(Grinding)', '타일 줄눈 시공', '기계 하부 정비', '건물 청소'],
-                reason: "쪼그려 앉아 하체 혈류가 제한된 상태(Q5)에서 상지를 과도하게 사용(Q4)하는 최고 위험군입니다.",
+                reason: "쪼그려 앉아 하체 혈류가 제한된 상태에서 상지를 과도하게 사용하는 최고 위험군입니다.",
                 guide: "무릎 보호대만으로는 부족합니다. 바퀴 달린 작업 의자(Creeper)를 도입해 무릎 굴곡을 없애고, 30분 작업/5분 스트레칭 사이클을 강제해야 합니다."
             },
             // ... (나머지 프로필들은 기존 유지, 아래 analyze 함수에서 동적 처리됨) ...
-            { id: 'floor_heavy', name: '🏗️ 저상 중량/설치형', weights: { q1: 20, q2: 90, q3: 20, q4: 30, q5: 100, q6: 20, q7: 80 }, examples: ['타일 운반/부착', '바닥 배관', '조경', '보도블럭'], reason: "바닥 자세(Q5)에서 중량물(Q7)과 허리 힘(Q2)을 동시에 사용하는 요추 고위험군입니다.", guide: "자재를 바닥에 두지 마십시오. 높이 조절 대차(Lift table)를 사용해 허리 굽힘을 원천 차단해야 합니다." },
-            { id: 'confined_space', name: '🕳️ 협소공간/정비형', weights: { q1: 20, q2: 100, q3: 40, q4: 50, q5: 80, q6: 0, q7: 20 }, examples: ['엔진룸', '탱크 내부', '맨홀', '배관 보수'], reason: "좁은 공간 제약으로 몸을 비틀고(Q2) 구부리는(Q5) 자세가 강요됩니다.", guide: "연속 작업 시간을 15분으로 제한하고, 외부 공간에서의 전신 신전(Stretching)을 작업 절차에 포함시키세요." },
-            { id: 'assembly_standing', name: '⚙️ 입식 라인 조립형', weights: { q1: 100, q2: 20, q3: 20, q4: 100, q5: 0, q6: 0, q7: 10 }, examples: ['자동차 의장', '전자제품 포장', '선별 라인', '미용사', '요리/제빵'], reason: "장시간 기립(Q1)과 상지 반복(Q4)이 결합된 전형적인 조립 공정입니다.", guide: "작업 높이를 팔꿈치 아래 5~10cm로 조정하고, 입식 의자(Standing stool)와 피로 예방 매트를 동시에 지급하세요." },
-            { id: 'overhead_static', name: '🎨 상향/고소 정밀형', weights: { q1: 80, q2: 40, q3: 100, q4: 80, q5: 0, q6: 0, q7: 10 }, examples: ['천장 도장', '전등/배선', '덕트 설치', '차량 하부'], reason: "어깨 위 작업(Q3)과 반복 동작(Q4)은 회전근개 손상의 직접적 원인입니다.", guide: "목 젖힘 방지 프리즘 안경과 팔 지지대(Exoskeleton) 도입이 시급합니다." },
-            { id: 'heavy_logistic', name: '📦 동적 물류/하역형', weights: { q1: 100, q2: 50, q3: 10, q4: 20, q5: 10, q6: 30, q7: 100 }, examples: ['상하차', '곰방', '이사짐', '자재 적재','정육/도축'], reason: "이동(Q1)과 고중량 취급(Q7)이 결합된 전신 근육 소모형 작업입니다.", guide: "허리 회전(Twisting)을 금지하고 발을 움직여 방향을 전환하세요. 파워 그립 장갑 착용 필수." },
-            { id: 'push_pull_cart', name: '🛒 중량 견인형', weights: { q1: 90, q2: 30, q3: 0, q4: 0, q5: 0, q6: 100, q7: 20 }, examples: ['대차 운반', '환자 이송', '롤테이너'], reason: "과도한 미는 힘(Q6)에 의한 어깨 및 요추 부담 패턴입니다.", guide: "바퀴 유지보수를 최우선으로 하고, 초기 기동 시 체중을 실어 미는 교육을 실시하세요." },
-            { id: 'precision_sedentary', name: '🔬 좌식 정밀/검사형', weights: { q1: 0, q2: 40, q3: 20, q4: 100, q5: 0, q6: 0, q7: 0 }, examples: ['미싱', 'PCB 납땜', '현미경 검사'], reason: "좌식 정적 자세와 손가락 반복 동작(Q4)이 결합되었습니다.", guide: "팔꿈치 받침대(Arm rest) 설치 및 50분 작업/10분 스트레칭 준수." },
-            { id: 'standing_guard', name: '👮 입식 감시/서비스형', weights: { q1: 100, q2: 0, q3: 0, q4: 10, q5: 0, q6: 0, q7: 0 }, examples: ['보안', '안내', '교통 정리'], reason: "움직임 없는 기립 자세(Q1)로 인한 하지 정맥류 위험군입니다.", guide: "발판(Foot rest)을 두어 체중을 이동시키고, 압박 스타킹 착용을 권장합니다." },
+            { id: 'floor_heavy', name: '🏗️ 저상 중량/설치형', weights: { q1: 20, q2: 90, q3: 20, q4: 30, q5: 100, q6: 20, q7: 80 }, examples: ['타일 운반/부착', '바닥 배관', '조경', '보도블럭'], reason: "바닥 자세에서 중량물과 허리 힘을 동시에 사용하는 요추 고위험군입니다.", guide: "자재를 바닥에 두지 마십시오. 높이 조절 대차(Lift table)를 사용해 허리 굽힘을 원천 차단해야 합니다." },
+            { id: 'confined_space', name: '🕳️ 협소공간/정비형', weights: { q1: 20, q2: 100, q3: 40, q4: 50, q5: 80, q6: 0, q7: 20 }, examples: ['엔진룸', '탱크 내부', '맨홀', '배관 보수'], reason: "좁은 공간 제약으로 몸을 비틀고 구부리는 자세가 강요됩니다.", guide: "연속 작업 시간을 15분으로 제한하고, 외부 공간에서의 전신 신전(Stretching)을 작업 절차에 포함시키세요." },
+            { id: 'assembly_standing', name: '⚙️ 입식 라인 조립형', weights: { q1: 100, q2: 20, q3: 20, q4: 100, q5: 0, q6: 0, q7: 10 }, examples: ['자동차 의장', '전자제품 포장', '선별 라인', '미용사', '요리/제빵'], reason: "장시간 기립과 상지 반복이 결합된 전형적인 조립 공정입니다.", guide: "작업 높이를 팔꿈치 아래 5~10cm로 조정하고, 입식 의자(Standing stool)와 피로 예방 매트를 동시에 지급하세요." },
+            { id: 'overhead_static', name: '🎨 상향/고소 정밀형', weights: { q1: 80, q2: 40, q3: 100, q4: 80, q5: 0, q6: 0, q7: 10 }, examples: ['천장 도장', '전등/배선', '덕트 설치', '차량 하부'], reason: "어깨 위 작업과 반복 동작은 회전근개 손상의 직접적 원인입니다.", guide: "목 젖힘 방지 프리즘 안경과 팔 지지대(Exoskeleton) 도입이 시급합니다." },
+            { id: 'heavy_logistic', name: '📦 동적 물류/하역형', weights: { q1: 100, q2: 50, q3: 10, q4: 20, q5: 10, q6: 30, q7: 100 }, examples: ['상하차', '곰방', '이사짐', '자재 적재','정육/도축'], reason: "이동과 고중량 취급이 결합된 전신 근육 소모형 작업입니다.", guide: "허리 회전(Twisting)을 금지하고 발을 움직여 방향을 전환하세요. 파워 그립 장갑 착용 필수." },
+            { id: 'push_pull_cart', name: '🛒 중량 견인형', weights: { q1: 90, q2: 30, q3: 0, q4: 0, q5: 0, q6: 100, q7: 20 }, examples: ['대차 운반', '환자 이송', '롤테이너'], reason: "과도한 미는 힘에 의한 어깨 및 요추 부담 패턴입니다.", guide: "바퀴 유지보수를 최우선으로 하고, 초기 기동 시 체중을 실어 미는 교육을 실시하세요." },
+            { id: 'precision_sedentary', name: '🔬 좌식 정밀/검사형', weights: { q1: 0, q2: 40, q3: 20, q4: 100, q5: 0, q6: 0, q7: 0 }, examples: ['미싱', 'PCB 납땜', '현미경 검사'], reason: "좌식 정적 자세와 손가락 반복 동작이 결합되었습니다.", guide: "팔꿈치 받침대(Arm rest) 설치 및 50분 작업/10분 스트레칭 준수." },
+            { id: 'standing_guard', name: '👮 입식 감시/서비스형', weights: { q1: 100, q2: 0, q3: 0, q4: 10, q5: 0, q6: 0, q7: 0 }, examples: ['보안', '안내', '교통 정리'], reason: "움직임 없는 기립 자세로 인한 하지 정맥류 위험군입니다.", guide: "발판(Foot rest)을 두어 체중을 이동시키고, 압박 스타킹 착용을 권장합니다." },
             { id: 'construction_general', name: '🧱 건설/복합 고강도형', weights: { q1: 80, q2: 80, q3: 60, q4: 40, q5: 60, q6: 40, q7: 80 }, examples: ['형틀', '철근', '비계', '석공'], reason: "신체 전반의 에너지 소모가 극심한 복합 고강도 작업입니다.", guide: "작업 강도에 따른 철저한 휴게 시간 보장 및 작업 순환(Job Rotation) 실시." },
-            { id: 'patient_care', name: '🏥 복합 돌봄/간호형', weights: { q1: 75, q2: 75, q3: 0, q4: 25, q5: 25, q6: 50, q7: 50 }, examples: ['간호사', '요양보호사'], reason: "환자 이송 시 발생하는 돌발적인 부하와 비틀림(Q2)이 위험 요인입니다.", guide: "슬라이딩 시트 등 보조 도구 사용을 의무화하고, 침대 높이를 허리 높이로 맞추세요." },
+            { id: 'patient_care', name: '🏥 복합 돌봄/간호형', weights: { q1: 75, q2: 75, q3: 0, q4: 25, q5: 25, q6: 50, q7: 50 }, examples: ['간호사', '요양보호사'], reason: "환자 이송 시 발생하는 돌발적인 부하와 비틀림이 위험 요인입니다.", guide: "슬라이딩 시트 등 보조 도구 사용을 의무화하고, 침대 높이를 허리 높이로 맞추세요." },
             { id: 'driver', name: '🚛 운전/진동형', weights: { q1: 0, q2: 50, q3: 0, q4: 0, q5: 0, q6: 0, q7: 20 }, examples: ['화물 운전', '지게차'], reason: "장시간 좌식 자세에서의 진동 노출과 허리 부담이 핵심입니다.", guide: "공기압 서스펜션 시트 적용 및 2시간마다 하차하여 스트레칭 필수." },
             { id: 'office_admin', name: '💻 일반 사무/관리형', weights: { q1: 10, q2: 0, q3: 0, q4: 20, q5: 0, q6: 0, q7: 0 }, examples: ['사무', '설계', '콜센터'], reason: "신체적 부하는 적으나 VDT 증후군 예방이 필요합니다.", guide: "모니터 상단을 눈높이에 맞추고, 의자 깊숙이 앉는 습관을 들이세요." },
-            { id: 'active_mobile', name: '🏃 활동적 이동형', weights: { q1: 100, q2: 0, q3: 0, q4: 0, q5: 0, q6: 0, q7: 50 }, examples: ['배달', '검침', '서빙'], reason: "높은 이동량(Q1)에 의한 하지 피로 누적이 주된 문제입니다.", guide: "충격 흡수 작업화(워킹화) 지급 및 휴식 시 다리를 높게 올리세요." }
+            { id: 'active_mobile', name: '🏃 활동적 이동형', weights: { q1: 100, q2: 0, q3: 0, q4: 0, q5: 0, q6: 0, q7: 50 }, examples: ['배달', '검침', '서빙'], reason: "높은 이동량에 의한 하지 피로 누적이 주된 문제입니다.", guide: "충격 흡수 작업화(워킹화) 지급 및 휴식 시 다리를 높게 올리세요." }
         ];
 
         // 4. UI 렌더링
@@ -482,96 +482,108 @@
                 });
             }
 
+          // =========================================================================
+            // ★ [최종 완성] 모듈형 개별 처방 + 7대 하이브리드 시너지 엔진 ★
             // =========================================================================
-            // ★ [핵심 수정] 7대 동적 복합 처방 매트릭스 (Dynamic Compound Prescription) ★
-            // =========================================================================
 
-            let finalGuide = bestMatch.guide;
-            let finalReason = bestMatch.reason;
-            let compoundDetected = false;
+            // 1. 7가지 항목별 개별 맞춤 처방 데이터 (사전 정의)
+            const prescriptions = {
+                q1: "<strong>장시간 기립 :</strong> 작업대 높이를 팔꿈치 높이로 맞추고, 피로 예방 매트 및 한 발을 얹을 수 있는 발판(Foot rest)을 제공하세요.",
+                q2: "<strong>허리 굽힘/비틀기 :</strong> 작업물의 위치를 허리 위로 높이거나, 손잡이가 긴 도구(Long-handled tools)를 사용하여 척추 굴곡을 방지하세요.",
+                q3: "<strong>어깨 위 작업 :</strong> 작업 발판을 높여 손의 위치를 심장 아래로 낮추고, 불가피할 경우 팔 지지대 도입을 검토하세요.",
+                q4: "<strong>고빈도 반복 작업 :</strong> 손목/팔꿈치 지지대를 설치하고, 50분 작업 당 최소 5~10분의 마이크로 휴식(Micro-break)과 스트레칭을 의무화하세요.",
+                q5: "<strong>쪼그려/무릎 꿇기 :</strong> 무릎 보호대(Knee pads) 착용은 필수이며, 가능한 한 바퀴 달린 낮은 의자를 사용하여 하지 혈류를 확보하세요.",
+                q6: "<strong>밀기/당기기 :</strong> 대차를 당기지 말고 미는(Pushing) 방식으로 전환하고, 바퀴의 구름 저항을 줄이기 위한 주기적인 정비가 최우선입니다.",
+                q7: "<strong>중량물 취급 :</strong> 기계적 보조 설비를 활용하여 직접 들기를 최소화하고, 취급 시 허리 회전(Twisting)을 엄격히 금지하세요."
+            };
 
-            // [우선순위 1] 허리 굽힘(Q2) + 중량물 들기(Q7) => 요추 디스크 파열 최고위험군
-            if (userScores.q7 >= 50 && userScores.q2 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 처방] 부적절한 자세의 중량물 취급 (LBI 고위험)</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>장비 도입:</strong> 허리를 굽힌 상태의 중량물 취급은 요추 디스크 압력을 한계치 이상으로 높입니다. <u>높이 조절형 대차(Lift Table)나 리프트</u>를 반드시 도입하십시오.</li>
-                    <li><strong>동작 원칙:</strong> 물건을 몸에 최대한 밀착시키고, 허리 회전(Twisting) 대신 발을 움직여 방향을 전환해야 합니다.</li>
-                </ul>`;
-                finalReason = `<strong>[요추 고위험]</strong> 허리 굽힘/비틀림(Q2: ${userScores.q2}%)과 중량물 취급(Q7: ${userScores.q7}%)이 결합되어 척추 손상 위험이 극대화되었습니다.`;
-                compoundDetected = true;
+            let finalGuideHTML = "";
+            let triggeredQs = [];
+
+            // 2. 위험 기준치(Threshold)를 넘은 항목 모두 찾기
+            questions.forEach(q => {
+                let val = userScores[q.id];
+                // Andersen(2021) 기준 엄격 적용 (서있기 50, 쪼그림/견인/중량 12.5, 나머지 25)
+                let threshold = 25;
+                if(q.id === 'q1') threshold = 50;
+                if(['q5','q6','q7'].includes(q.id)) threshold = 12.5;
+
+                if (val >= threshold) {
+                    triggeredQs.push(q.id);
+                    // 기준치를 넘은 모든 항목의 개별 처방을 리스트로 추가
+                    finalGuideHTML += `<li style="margin-bottom:6px;">${prescriptions[q.id]}</li>`;
+                }
+            });
+
+            // 기준치를 넘은 항목이 하나도 없으면 기본 가이드 출력
+            if (triggeredQs.length === 0) {
+                finalGuideHTML = `<li style="margin-bottom:6px;">${bestMatch.guide}</li>`;
             }
 
-            // [우선순위 2] 쪼그려 앉기(Q5) + 상지 반복(Q4) => 질문자님 케이스 (용접, 사상, 청소)
-            else if (userScores.q5 >= 50 && userScores.q4 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#c0392b; font-weight:bold;">🚨 [긴급 처방] 하지 고정 + 상지 고반복</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>엔지니어링 개선:</strong> 하체 혈류가 차단된 상태의 반복 작업은 전신 피로를 급증시킵니다. <u>바퀴 달린 작업 의자(Creeper Seat)</u>를 도입해 무릎 굴곡을 없애야 합니다.</li>
-                    <li><strong>작업물 조정:</strong> 작업물을 지면에서 30cm 이상 띄우는 지그(Jig)를 사용하고, 45분 작업 후 10분 기립 휴식을 강제하십시오.</li>
-                </ul>`;
-                finalReason = `<strong>[복합 피로]</strong> 부자연스러운 하체 자세(Q5: ${userScores.q5}%)와 고반복 상지 작업(Q4: ${userScores.q4}%)이 결합되어 근피로 누적이 단독 요인보다 훨씬 빠릅니다.`;
-                compoundDetected = true;
+            // 3. [시너지 엔진] 7대 복합 위험 시나리오 모두 검사 (독립적 누적 방식)
+            let synergyAlert = "";
+
+           
+            // ① 허리 굽힘(Q2) + 중량물(Q7)
+            if (triggeredQs.includes('q2') && triggeredQs.includes('q7')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fdedec; border-left:4px solid #c0392b; color:#c0392b; font-size:0.9rem;">
+                    <strong>🚨 [통합 솔루션] 부적절한 자세의 중량물 취급 (요추 고위험)</strong><br>
+                    허리를 굽힌 상태의 중량물 취급은 요추 디스크 압력을 한계치 이상으로 높입니다. <u>높이 조절형 대차(Lift Table)</u>를 반드시 사용하여 허리 굽힘을 원천 차단하십시오.
+                </div>`;
             }
 
-            // [우선순위 3] 어깨 위 작업(Q3) + 상지 반복(Q4) => 회전근개 파열 / 어깨 충돌 증후군
-            else if (userScores.q3 >= 50 && userScores.q4 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 어깨 위 정적 자세 + 동적 반복</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>자세 개선:</strong> 작업 발판을 높이거나 작업물을 낮추어 손의 위치를 <u>심장 높이 아래</u>로 조정하는 것이 최우선입니다.</li>
-                    <li><strong>보조구 활용:</strong> 공구의 무게가 더해진다면 팔을 지탱해주는 <u>웨어러블 슈트(Exoskeleton)나 툴 발란서</u>를 설치하십시오.</li>
-                </ul>`;
-                finalReason = `<strong>[어깨 고위험]</strong> 팔을 들고 있는 정적 부하(Q3: ${userScores.q3}%)에 반복 동작(Q4: ${userScores.q4}%)이 더해져 어깨 건(Tendon)의 마모가 가속화됩니다.`;
-                compoundDetected = true;
+            // ② 쪼그려 앉기(Q5) + 상지 반복(Q4)
+            if (triggeredQs.includes('q5') && triggeredQs.includes('q4')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fdedec; border-left:4px solid #c0392b; color:#c0392b; font-size:0.9rem;">
+                    <strong>🚨 [통합 솔루션] 하지 고정 + 상지 고반복 (복합 피로)</strong><br>
+                    하체 혈류가 차단된 상태의 반복 작업은 전신 피로를 급증시킵니다. <u>바퀴 달린 작업 의자(Creeper Seat)</u>를 도입하고, 작업물을 지면에서 30cm 이상 띄우는 <u>지그(Jig)</u>를 사용하세요.
+                </div>`;
             }
 
-            // [우선순위 4] 밀기/당기기(Q6) + 허리 굽힘/비틀기(Q2) => 대차 운반 시 허리 손상
-            else if (userScores.q6 >= 50 && userScores.q2 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#d35400; font-weight:bold;">⚠️ [복합 처방] 비대칭 견인/대차 작업</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>작업 방식:</strong> 카트를 당기지 말고 <u>진행 방향을 보며 미는(Pushing) 방식</u>으로 전환하여 허리 비틀림을 방지하십시오.</li>
-                    <li><strong>장비 점검:</strong> 바퀴의 구름 저항이 높을수록 허리 부하가 급증합니다. 바퀴 베어링 교체 및 바닥 평탄화 작업이 시급합니다.</li>
-                </ul>`;
-                finalReason = `<strong>[요추 전단력]</strong> 무거운 것을 밀고 당기면서(Q6: ${userScores.q6}%) 허리를 비트는(Q2: ${userScores.q2}%) 동작은 척추에 치명적인 전단력(Shear force)을 발생시킵니다.`;
-                compoundDetected = true;
+            // ③ 어깨 위 작업(Q3) + 상지 반복(Q4)
+            if (triggeredQs.includes('q3') && triggeredQs.includes('q4')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fdf2e9; border-left:4px solid #d35400; color:#d35400; font-size:0.9rem;">
+                    <strong>⚠️ [통합 솔루션] 어깨 위 정적 자세 + 동적 반복 (회전근개 주의)</strong><br>
+                    팔을 든 정적 부하에 반복 동작이 더해져 어깨 건 마모가 가속화됩니다. 손 위치를 심장 아래로 낮추거나 <u>웨어러블 슈트(Exoskeleton)</u> 등 팔 지지대를 활용하세요.
+                </div>`;
             }
 
-            // [우선순위 5] 서 있기(Q1) + 허리 굽힘(Q2) => 정적 굽힘 (가장 흔한 요통 원인: 컨베이어 작업, 다림질 등)
-            else if (userScores.q1 >= 75 && userScores.q2 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 장시간 기립 + 정적 허리 굽힘</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>환경 개선:</strong> 허리를 굽히게 만드는 원인(작업대 높이 낮음 등)을 찾아 <u>작업대 높이를 작업자 팔꿈치 수준으로 상향</u> 조정하십시오.</li>
-                    <li><strong>보조 도구:</strong> 입식 의자(Standing stool)와 피로 예방 매트를 설치하고, 한 발을 올릴 수 있는 발판(Foot rest)을 제공하세요.</li>
-                </ul>`;
-                finalReason = `<strong>[척추 기립근 피로]</strong> 서 있는 상태(Q1: ${userScores.q1}%)에서 지속적으로 허리를 숙이는(Q2: ${userScores.q2}%) 정적 자세는 척추 기립근에 허혈성 통증을 유발합니다.`;
-                compoundDetected = true;
+            // ④ 밀기/당기기(Q6) + 허리 비틀기/굽힘(Q2)
+            if (triggeredQs.includes('q6') && triggeredQs.includes('q2')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fdf2e9; border-left:4px solid #d35400; color:#d35400; font-size:0.9rem;">
+                    <strong>⚠️ [통합 솔루션] 비대칭 견인/대차 작업 (요추 전단력)</strong><br>
+                    무거운 카트를 당기며 허리를 비트는 동작은 척추에 치명적입니다. 반드시 <u>진행 방향을 보며 미는(Pushing) 방식</u>으로 전환하고 바퀴 베어링을 교체하십시오.
+                </div>`;
             }
 
-            // [우선순위 6] 허리 굽힘(Q2) + 상지 반복(Q4) => 숙인 채로 손을 쓰는 작업 (청소, 낮은 곳 정비 등)
-            else if (userScores.q2 >= 50 && userScores.q4 >= 50) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#e67e22; font-weight:bold;">⚠️ [복합 처방] 상체 전방 굴곡 + 손/팔 반복</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>도구 연장:</strong> 허리를 굽히지 않고도 작업할 수 있도록 <u>손잡이가 긴 도구(Long-handled tools)</u>로 교체하십시오.</li>
-                    <li><strong>작업물 이동:</strong> 가능하다면 작업물을 바닥이나 낮은 곳에서 허리 높이의 작업대로 올려놓고 작업해야 합니다.</li>
-                </ul>`;
-                finalReason = `<strong>[복합 긴장]</strong> 상체를 숙여 무게중심이 무너진 상태(Q2)에서 팔을 반복적으로 움직이면(Q4) 등과 목의 근육에 지속적인 긴장이 발생합니다.`;
-                compoundDetected = true;
+            // ⑤ 서 있기(Q1) + 허리 굽힘(Q2)
+            if (triggeredQs.includes('q1') && triggeredQs.includes('q2')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fef5e7; border-left:4px solid #e67e22; color:#e67e22; font-size:0.9rem;">
+                    <strong>⚠️ [통합 솔루션] 장시간 기립 + 정적 허리 굽힘</strong><br>
+                    서 있는 상태에서 지속적으로 허리를 숙이면 척추 기립근에 허혈성 통증이 발생합니다. <u>작업대 높이를 작업자 팔꿈치 수준으로 상향</u> 조정하는 것이 핵심입니다.
+                </div>`;
             }
 
-            // [우선순위 7] 장시간 기립(Q1) + 상지 반복(Q4) => 전형적인 라인 작업 (제조조립, 미용사, 제빵)
-            else if (userScores.q1 >= 75 && userScores.q4 >= 75 && !compoundDetected) {
-                finalGuide = `
-                <div style="margin-bottom:8px; color:#f39c12; font-weight:bold;">⚡ [처방] 정적 기립 + 고빈도 반복</div>
-                <ul style="margin:0; padding-left:20px; color:#333;">
-                    <li><strong>피로 관리:</strong> 하지 정맥류와 손목 건초염이 동시에 발생할 수 있습니다. 피로 예방 매트를 깔고 손목/팔꿈치 지지대를 제공하십시오.</li>
-                    <li><strong>스트레칭:</strong> 1시간마다 손목 털기와 하체 스트레칭을 병행해야 합니다.</li>
-                </ul>`;
-                // 이유(Reason)는 기본 프로필(예: 입식 조립형)의 설명을 그대로 쓰되 가이드만 보강
+            // ⑥ 허리 굽힘(Q2) + 상지 반복(Q4)
+            if (triggeredQs.includes('q2') && triggeredQs.includes('q4') && !triggeredQs.includes('q5')) {
+                // Q5(쪼그림)가 없을 때만 발동 (Q5+Q4 시너지와 중복 방지)
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fef5e7; border-left:4px solid #e67e22; color:#e67e22; font-size:0.9rem;">
+                    <strong>⚠️ [통합 솔루션] 상체 전방 굴곡 + 손/팔 반복</strong><br>
+                    무게중심이 무너진 상태의 반복 작업은 등과 목에 지속적인 긴장을 줍니다. 손잡이가 긴 도구로 교체하거나 <u>작업물을 허리 높이로 올려놓고</u> 작업하세요.
+                </div>`;
             }
+
+            // ⑦ 장시간 기립(Q1) + 상지 반복(Q4)
+            if (triggeredQs.includes('q1') && triggeredQs.includes('q4')) {
+                synergyAlert += `<div style="margin-bottom:10px; padding:12px; background:#fef9e7; border-left:4px solid #f39c12; color:#d68910; font-size:0.9rem;">
+                    <strong>⚡ [통합 솔루션] 정적 기립 + 고빈도 반복 (라인 조립형)</strong><br>
+                    하지 정맥류와 상지 건초염 위험이 공존합니다. 피로 예방 매트와 손목 지지대를 동시 적용하고, 1시간마다 전신 스트레칭을 병행하십시오.
+                </div>`;
+            }
+
+            // 4. 최종 가이드 조립 (시너지 경고 블록들 + 개별 처방 리스트)
+            let finalGuide = `<div style="margin-top:10px; font-weight:bold; color:#2c3e50;">📌 항목별 필수 개선 사항</div><ul style="margin-top:5px; padding-left:20px; color:#333; font-size:0.95rem;">${finalGuideHTML}</ul>` + synergyAlert;
+            let finalReason = bestMatch.reason; // AI 판단 이유는 매칭된 직업 프로필 설명을 유지
 
             // E. 결과 출력 (수정된 finalGuide, finalReason 적용)
             document.getElementById('resTitle').innerText = bestMatch.name;
@@ -638,4 +650,3 @@
     </script>
 </body>
 </html>
-

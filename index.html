@@ -152,6 +152,7 @@
   .mini.go{background:var(--brand);border-color:var(--brand);color:#fff}
   @media(hover:hover){.mini.go:hover{opacity:.9;color:#fff}}
   .mini.rate{background:var(--card);border-color:var(--gold);color:var(--gold)}
+  .mini.busy{opacity:.55;pointer-events:none}
   @media(hover:hover){.mini.rate:hover{background:var(--gold);color:#fff;border-color:var(--gold)}}
 
   .empty{text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px}
@@ -243,7 +244,10 @@
     }
     header.compact .searchbar{margin-top:0}
     header .title,header .origin{transition:max-height .18s ease,opacity .12s ease;max-height:200px}
+    /* 모바일에서는 관리자용(정렬·표본·설정·저장/복원·업데이트)을 감춘다 */
+    .admin-only{display:none !important}
     .toolbar select{flex:1 1 calc(50% - 4px);min-width:0;padding:9px 10px}
+    .fab-in .stamp{flex:1 1 100%;text-align:center}
     .count{margin-left:0;flex:1 1 100%}
     .mini{padding:10px 6px;font-size:13px}      /* 손가락 터치 영역 확보 */
     .chip{min-height:44px;display:inline-flex;align-items:center;padding:0 14px}
@@ -273,8 +277,8 @@
     </div>
     <div class="origin">
       <span class="pin">📍 기준점</span>
-      <span>교육원 정문 · 울산광역시 중구 성안동 276 · 🚶 도보 기준</span>
-      <button class="btn sm" id="btnCopyOrigin" title="출발지 주소 복사">📋 출발지 복사</button>
+      <span>교육원 정문</span>
+      <button class="btn sm" id="btnCopyOrigin" title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
     </div>
     <div class="searchbar">
       <input id="q" type="text" placeholder="상호 · 메뉴 · 동네로 검색 (예: 국밥, 짬뽕, 우정동)" autocomplete="off">
@@ -290,7 +294,7 @@
   <section class="base" id="baseCard"></section>
 
   <div class="toolbar">
-    <label>정렬
+    <label class="admin-only">정렬
       <select id="sort">
         <option value="verdict">교육원 대비 추천순</option>
         <option value="dist" selected>가까운 순</option>
@@ -308,8 +312,8 @@
     </label>
     <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="hideClosed" checked> 폐업 숨기기</label>
     <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="onlyRated"> 평가 있는 곳만</label>
-    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="showAll"> 표본 무시하고 전체</label>
-    <button class="btn sm" id="btnReshuffle" title="2km 밖 표본을 다시 뽑습니다">🎲 다시 섞기</button>
+    <label class="admin-only" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="showAll"> 표본 무시하고 전체</label>
+    <button class="btn sm admin-only" id="btnReshuffle" title="2km 밖 표본을 다시 뽑습니다">🎲 다시 섞기</button>
     <span class="count" id="count"></span>
   </div>
 
@@ -326,9 +330,9 @@
 <div class="fab">
   <div class="fab-in">
     <span class="stamp" id="stamp"></span>
-    <button class="btn sm" id="btnSetup">⚙ 설정</button>
-    <button class="btn sm" id="btnIO">저장/복원</button>
-    <button class="btn primary sm" id="btnUpdate">🔄 업데이트</button>
+    <button class="btn sm admin-only" id="btnSetup">⚙ 설정</button>
+    <button class="btn sm admin-only" id="btnIO">저장/복원</button>
+    <button class="btn primary sm admin-only" id="btnUpdate">🔄 업데이트</button>
   </div>
 </div>
 
@@ -497,8 +501,9 @@
    0. 기준점 / 상수
    ========================================================================= */
 const ORIGIN = {
-  name:'교육원 정문 (성안동 276)',
+  name:'교육원 정문',
   addr:'울산광역시 중구 성안동 276',
+  lat:35.5641222, lng:129.3215835      /* 성안동 276 = 교육원 정문 */
 };
 
 /* 길찾기에 사용할 지도 서비스: 'kakao' | 'naver' */
@@ -774,6 +779,70 @@ const PROVIDERS = {
   naver:{ label:'네이버지도', url:naverRoute }
 };
 function routeUrl(r){ return (PROVIDERS[MAP_PROVIDER]||PROVIDERS.kakao).url(r); }
+
+/* =========================================================================
+   모바일: 설치된 지도앱을 직접 실행
+   - 카카오맵 / 네이버지도 앱 URL 스킴을 차례로 시도한다
+   - 앱이 열리면 브라우저가 백그라운드로 내려가므로 visibilitychange 로 감지
+   - 둘 다 반응이 없으면 미설치로 보고 안내한다
+   ========================================================================= */
+const IS_MOBILE = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+               || (matchMedia('(pointer:coarse)').matches && innerWidth <= 900);
+const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+function kakaoAppUrl(r){
+  if(hasCoord(ORIGIN) && hasCoord(r))
+    return `kakaomap://route?sp=${ORIGIN.lat},${ORIGIN.lng}&ep=${r.lat},${r.lng}&by=FOOT`;
+  return `kakaomap://search?q=${enc(destQuery(r))}`;
+}
+function naverAppUrl(r){
+  const app = enc('교육원주변식당');
+  if(hasCoord(ORIGIN) && hasCoord(r))
+    return `nmap://route/walk?slat=${ORIGIN.lat}&slng=${ORIGIN.lng}&sname=${enc(ORIGIN.name)}`
+         + `&dlat=${r.lat}&dlng=${r.lng}&dname=${enc(r.name)}&appname=${app}`;
+  return `nmap://search?query=${enc(destQuery(r))}&appname=${app}`;
+}
+function hasCoord(o){ return o && o.lat!=null && o.lng!=null; }
+
+/* 스킴을 한 번 시도하고, 앱 전환이 일어났는지 판정 */
+function trySchemeOnce(url, waitMs){
+  return new Promise(resolve=>{
+    let switched = false;
+    const mark = ()=>{ if(document.hidden) switched = true; };
+    document.addEventListener('visibilitychange', mark);
+    window.addEventListener('pagehide', mark);
+    window.addEventListener('blur', mark);
+
+    if(IS_IOS){
+      location.href = url;                     // iOS는 iframe 방식이 막혀 있다
+    }else{
+      const f = document.createElement('iframe');
+      f.style.cssText = 'display:none';
+      f.src = url;
+      document.body.appendChild(f);
+      setTimeout(()=>f.remove(), waitMs + 200);
+    }
+    setTimeout(()=>{
+      document.removeEventListener('visibilitychange', mark);
+      window.removeEventListener('pagehide', mark);
+      window.removeEventListener('blur', mark);
+      resolve(switched || document.hidden);
+    }, waitMs);
+  });
+}
+
+/* 사용자가 고른 지도를 먼저, 실패하면 다른 지도를 시도 */
+async function openMapApp(r){
+  const order = MAP_PROVIDER === 'naver'
+    ? [['네이버지도', naverAppUrl(r)], ['카카오맵', kakaoAppUrl(r)]]
+    : [['카카오맵', kakaoAppUrl(r)], ['네이버지도', naverAppUrl(r)]];
+
+  for(const [label, url] of order){
+    const ok = await trySchemeOnce(url, 1200);
+    if(ok) return label;
+  }
+  return null;
+}
 function providerLabel(){ return (PROVIDERS[MAP_PROVIDER]||PROVIDERS.kakao).label; }
 /* 받침이 있으면 '으로', 없거나 ㄹ이면 '로' (카카오맵으로 / 네이버지도로) */
 function ro(word){
@@ -1113,7 +1182,18 @@ function render(){
 /* 목록 클릭은 위임 방식으로 딱 한 번만 연결한다(기존에는 렌더마다 재바인딩) */
 $('#list').addEventListener('click', e=>{
   const go = e.target.closest('[data-route]');
-  if(go){ copyOrigin(); return; }                 // 링크는 그대로 열리고 출발지만 복사
+  if(go){
+    if(!IS_MOBILE){ copyOrigin(); return; }       // 데스크톱: 기존대로 웹 지도 열기
+    e.preventDefault();                            // 모바일: 설치된 지도앱 실행
+    const r = DATA.find(x=>x.id===go.dataset.route);
+    if(!r) return;
+    go.classList.add('busy');
+    openMapApp(r).then(opened=>{
+      go.classList.remove('busy');
+      if(!opened) toast('지도앱이 설치되어 있지 않습니다.');
+    });
+    return;
+  }
   const rt = e.target.closest('[data-rate]');
   if(rt){ openRate(rt.dataset.rate); return; }
   const ct = e.target.closest('[data-cmt]');
@@ -1558,7 +1638,7 @@ async function handleFile(file){
   try{ text = new TextDecoder('utf-8',{fatal:true}).decode(buf); }
   catch(_){ try{ text=new TextDecoder('euc-kr').decode(buf); logLine('인코딩: CP949(EUC-KR)로 해석'); }catch(e){ text=new TextDecoder('utf-8').decode(buf); } }
   if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
-  if(/�/.test(text.slice(0,3000))){ try{ text=new TextDecoder('euc-kr').decode(buf); logLine('인코딩: CP949(EUC-KR)로 재해석'); }catch(_){} }
+  if(/ /.test(text.slice(0,3000))){ try{ text=new TextDecoder('euc-kr').decode(buf); logLine('인코딩: CP949(EUC-KR)로 재해석'); }catch(_){} }
   let objs=[]; const t=text.trim();
   if(t.startsWith('{')||t.startsWith('[')){
     let json; try{ json=JSON.parse(t); }catch(e){ logLine(`<span class="r">✕ JSON 파싱 실패: ${esc(e.message)}</span>`); return; }

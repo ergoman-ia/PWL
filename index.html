@@ -153,6 +153,8 @@
   @media(hover:hover){.mini.go:hover{opacity:.9;color:#fff}}
   .mini.rate{background:var(--card);border-color:var(--gold);color:var(--gold)}
   .mini.busy{opacity:.55;pointer-events:none}
+  .mini.rate-top{flex:0 0 auto;display:inline-flex;align-items:center;
+    padding:7px 13px;min-height:36px;font-size:12.5px}
   @media(hover:hover){.mini.rate:hover{background:var(--gold);color:#fff;border-color:var(--gold)}}
 
   .empty{text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px}
@@ -246,6 +248,7 @@
     header .title,header .origin{transition:max-height .18s ease,opacity .12s ease;max-height:200px}
     /* 모바일에서는 관리자용(정렬·표본·설정·저장/복원·업데이트)을 감춘다 */
     .admin-only{display:none !important}
+    .mini.rate-top{padding:6px 12px;min-height:34px;font-size:12px}
     .toolbar select{flex:1 1 calc(50% - 4px);min-width:0;padding:9px 10px}
     .fab-in .stamp{flex:1 1 100%;text-align:center}
     .count{margin-left:0;flex:1 1 100%}
@@ -294,15 +297,8 @@
   <section class="base" id="baseCard"></section>
 
   <div class="toolbar">
-    <label class="admin-only">정렬
-      <select id="sort">
-        <option value="verdict">교육원 대비 추천순</option>
-        <option value="dist" selected>가까운 순</option>
-        <option value="name">이름순</option>
-        <option value="cat">업종순</option>
-      </select>
-    </label>
-    <label>거리
+    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="sortDist"> 거리순 정렬</label>
+    <label class="admin-only">거리
       <select id="radius">
         <option value="1">1km 이내 (도보 약 13분)</option>
         <option value="2">2km 이내 (도보 약 26분) · 전수</option>
@@ -1066,7 +1062,6 @@ function buildChips(){
 
 function visible(){
   const q = $('#q').value.trim().toLowerCase();
-  const byVerdict = $('#sort').value==='verdict';
   const rad = parseFloat($('#radius').value);
   const hide = $('#hideClosed').checked;
   const onlyRated = $('#onlyRated').checked;
@@ -1082,22 +1077,14 @@ function visible(){
     }
     return true;
   });
-  const s = $('#sort').value;
-  let key = null;
-  if(byVerdict){                                    /* 비교 함수 안에서 재계산하지 않도록 미리 1회 산출 */
-    key = new Map();
-    for(const r of rows){ const A=agg(r.id); key.set(r.id, {s:A.score===null?-99:A.score, n:A.n}); }
-  }
+  /* 기본은 상호명순, '거리순 정렬'을 켜면 가까운 순 */
+  const byDist = $('#sortDist').checked;
   rows.sort((a,b)=>{
-    if(s==='name') return a.name.localeCompare(b.name,'ko');
-    if(s==='cat'){ const d=CATS.indexOf(a.category)-CATS.indexOf(b.category); return d!==0?d:(a.dist||0)-(b.dist||0); }
-    if(s==='verdict'){
-      const A=key.get(a.id), B=key.get(b.id);
-      if(B.s!==A.s) return B.s-A.s;
-      if(B.n!==A.n) return B.n-A.n;
-      return (a.dist||0)-(b.dist||0);
+    if(byDist){
+      const d = (a.dist ?? 99) - (b.dist ?? 99);
+      if(d !== 0) return d;
     }
-    return (a.dist||0)-(b.dist||0);
+    return a.name.localeCompare(b.name,'ko');
   });
   return rows;
 }
@@ -1122,6 +1109,7 @@ function card(r){
     <div class="c-top">
       <div class="c-name">${esc(r.name)}</div>
       <span class="cat" data-c="${esc(r.category)}">${esc(r.category)}</span>
+      <button class="mini rate rate-top" data-rate="${r.id}">⭐ 평가</button>
     </div>
     ${r.menu?`<div class="c-menu">${esc(r.menu)}</div>`:''}
 
@@ -1141,11 +1129,13 @@ function card(r){
       <span>📏 <b>${distLabel(r.dist, r.geo)}</b></span>${r.geo?'':'<span class="dim" title="좌표 미검증 – 실제 거리와 다를 수 있습니다">⚠</span>'}
       <span class="status ${lt.c}">⏱ ${lt.t}</span>
     </div>
-    <div class="c-meta">${r.address?`<span>📍 ${esc(r.address)}</span>`:''}${r.zone?`<span>· ${esc(r.zone)}</span>`:''}</div>
+    <div class="c-meta">
+      ${r.address?`<span>📍 ${esc(r.address)}</span>`:''}
+      ${r.zone?`<span class="admin-only">· ${esc(r.zone)}</span>`:''}
+    </div>
     ${r.note?`<div class="c-meta"><span style="color:var(--warn)">⚠ ${esc(r.note)}</span></div>`:''}
 
-    <div class="c-act">
-      <button class="mini rate" data-rate="${r.id}">⭐ 평가</button>
+    <div class="c-act admin-only">
       <a class="mini go" href="${routeUrl(r)}" target="_blank" rel="noopener"
          data-route="${r.id}"
          title="${providerLabel()}에서 이 주소로 열기 · 출발지 주소는 클립보드에 복사됩니다">🚶 길찾기</a>
@@ -1160,14 +1150,6 @@ function render(){
   const box = $('#list');
   if(!rows.length){
     box.innerHTML = `<div class="empty">조건에 맞는 식당이 없습니다.<br>업종 필터나 거리 범위를 넓혀 보세요.</div>`;
-  } else if($('#sort').value==='cat'){
-    let html='';
-    CATS.forEach(c=>{
-      const g = rows.filter(r=>r.category===c);
-      if(!g.length) return;
-      html += `<div class="group-h">${c} <span style="font-weight:500">${g.length}곳</span></div><div class="grid">${g.map(card).join('')}</div>`;
-    });
-    box.innerHTML = html;
   } else {
     box.innerHTML = `<div class="grid">${rows.map(card).join('')}</div>`;
   }
@@ -1787,7 +1769,7 @@ $('#q').addEventListener('input', ()=>{             /* 타이핑마다 60장 다
   clearTimeout(_qTimer);
   _qTimer = setTimeout(renderSoon, 140);
 });
-$('#sort').addEventListener('change', renderSoon);
+$('#sortDist').addEventListener('change', renderSoon);
 $('#radius').addEventListener('change', renderSoon);
 $('#hideClosed').addEventListener('change', renderSoon);
 $('#onlyRated').addEventListener('change', renderSoon);

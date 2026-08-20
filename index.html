@@ -799,6 +799,18 @@ const IS_MOBILE = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
                || (matchMedia('(pointer:coarse)').matches && innerWidth <= 900);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
+/* 카카오톡·네이버·인스타 등 '인앱 브라우저'는 tel: 을 열 때마다
+   "앱 전환을 허용하시겠습니까?" 확인창을 띄운다. 이 경우 전화 걸기 대신
+   번호를 복사해 주는 편이 낫다. */
+const IS_INAPP = /KAKAOTALK|NAVER\(inapp|DaumApps|Instagram|FBAN|FBAV|FB_IAB|Line\/|everytimeApp|wadiz|AliApp|zumapp|kakaostory/i
+  .test(navigator.userAgent);
+
+function copyText(text, msg){
+  const ok = legacyCopy(text);
+  if(!ok && navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).catch(()=>{});
+  toast(msg);
+}
+
 function kakaoAppUrl(r){
   if(hasCoord(ORIGIN) && hasCoord(r))
     return `kakaomap://route?sp=${ORIGIN.lat},${ORIGIN.lng}&ep=${r.lat},${r.lng}&by=FOOT`;
@@ -1146,13 +1158,13 @@ function card(r){
       <span class="addr">${r.address?`📍 ${esc(r.address)}`:''}</span>
       ${r.zone?`<span class="admin-only">· ${esc(r.zone)}</span>`:''}
       ${r.tel?`<a class="mini tel-inline" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
-         title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:''}
+         data-tel="${esc(r.tel)}" title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:''}
     </div>
     ${r.note?`<div class="c-meta"><span style="color:var(--warn)">⚠ ${esc(r.note)}</span></div>`:''}
 
     <div class="c-act admin-only">
       ${r.tel?`<a class="mini" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
-         title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:'<span class="mini dim" style="cursor:default">번호 없음</span>'}
+         data-tel="${esc(r.tel)}" title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:'<span class="mini dim" style="cursor:default">번호 없음</span>'}
       <a class="mini go" href="${routeUrl(r)}" target="_blank" rel="noopener"
          data-route="${r.id}"
          title="${providerLabel()}에서 이 주소로 열기 · 출발지 주소는 클립보드에 복사됩니다">🚶 길찾기</a>
@@ -1179,6 +1191,13 @@ function render(){
 
 /* 목록 클릭은 위임 방식으로 딱 한 번만 연결한다(기존에는 렌더마다 재바인딩) */
 $('#list').addEventListener('click', e=>{
+  const tel = e.target.closest('[data-tel]');
+  if(tel && IS_INAPP){                            // 인앱 브라우저: 확인창 대신 번호 복사
+    e.preventDefault();
+    copyText(tel.dataset.tel, `전화번호 ${tel.dataset.tel} 복사됨 · 전화 앱에 붙여넣기`);
+    return;
+  }
+
   const go = e.target.closest('[data-route]');
   if(go){
     if(!IS_MOBILE){ copyOrigin(); return; }       // 데스크톱: 기존대로 웹 지도 열기

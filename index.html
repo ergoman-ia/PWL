@@ -46,6 +46,8 @@
   .title{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   h1{font-size:19px;margin:0;letter-spacing:-.4px}
   .sub{font-size:12.5px;color:var(--ink2)}
+  .sub-row{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+  .copy-sub{display:none}
   .origin{margin-top:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
   .pin{display:inline-flex;align-items:center;gap:5px;background:var(--brand-soft);color:var(--brand);padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px}
   .searchbar{display:flex;gap:8px;margin:11px 0 9px}
@@ -155,6 +157,10 @@
   .mini.busy{opacity:.55;pointer-events:none}
   .mini.rate-top{flex:0 0 auto;display:inline-flex;align-items:center;
     padding:7px 13px;min-height:36px;font-size:12.5px}
+  .addr-row{display:flex;align-items:center;gap:8px}
+  .addr-row .addr{flex:1;min-width:0}
+  .mini.tel-inline{flex:0 0 auto;display:none;align-items:center;
+    padding:7px 11px;min-height:36px;font-size:12px;white-space:nowrap}
   @media(hover:hover){.mini.rate:hover{background:var(--gold);color:#fff;border-color:var(--gold)}}
 
   .empty{text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px}
@@ -249,6 +255,10 @@
     /* 모바일에서는 관리자용(정렬·표본·설정·저장/복원·업데이트)을 감춘다 */
     .admin-only{display:none !important}
     .mini.rate-top{padding:6px 12px;min-height:34px;font-size:12px}
+    .sub-long{display:none}                              /* 부제를 줄여 자리를 만든다 */
+    .copy-sub{display:inline-flex;align-items:center;flex:0 0 auto;
+      min-height:34px;padding:6px 11px;font-size:12px}   /* 도보 기준 바로 오른쪽 */
+    .mini.tel-inline{display:inline-flex;min-height:38px}   /* 주소 줄에 전화 버튼 노출 */
     .toolbar select{flex:1 1 calc(50% - 4px);min-width:0;padding:9px 10px}
     .fab-in .stamp{flex:1 1 100%;text-align:center}
     .count{margin-left:0;flex:1 1 100%}
@@ -276,12 +286,15 @@
   <div class="hd-in">
     <div class="title">
       <h1>교육원 주변 식당 찾기</h1>
-      <span class="sub">교육생용 · 구내식당 대비 평가 · 🚶 도보 기준</span>
+      <span class="sub-row">
+        <span class="sub"><span class="sub-long">교육생용 · 구내식당 대비 평가 · </span>🚶 도보 기준</span>
+        <button class="btn sm copy-sub" data-copy-origin title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
+      </span>
     </div>
-    <div class="origin">
+    <div class="origin admin-only">
       <span class="pin">📍 기준점</span>
       <span>교육원 정문</span>
-      <button class="btn sm" id="btnCopyOrigin" title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
+      <button class="btn sm" data-copy-origin title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
     </div>
     <div class="searchbar">
       <input id="q" type="text" placeholder="상호 · 메뉴 · 동네로 검색 (예: 국밥, 짬뽕, 우정동)" autocomplete="off">
@@ -1129,17 +1142,20 @@ function card(r){
       <span>📏 <b>${distLabel(r.dist, r.geo)}</b></span>${r.geo?'':'<span class="dim" title="좌표 미검증 – 실제 거리와 다를 수 있습니다">⚠</span>'}
       <span class="status ${lt.c}">⏱ ${lt.t}</span>
     </div>
-    <div class="c-meta">
-      ${r.address?`<span>📍 ${esc(r.address)}</span>`:''}
+    <div class="c-meta addr-row">
+      <span class="addr">${r.address?`📍 ${esc(r.address)}`:''}</span>
       ${r.zone?`<span class="admin-only">· ${esc(r.zone)}</span>`:''}
+      ${r.tel?`<a class="mini tel-inline" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
+         title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:''}
     </div>
     ${r.note?`<div class="c-meta"><span style="color:var(--warn)">⚠ ${esc(r.note)}</span></div>`:''}
 
     <div class="c-act admin-only">
+      ${r.tel?`<a class="mini" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
+         title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:'<span class="mini dim" style="cursor:default">번호 없음</span>'}
       <a class="mini go" href="${routeUrl(r)}" target="_blank" rel="noopener"
          data-route="${r.id}"
          title="${providerLabel()}에서 이 주소로 열기 · 출발지 주소는 클립보드에 복사됩니다">🚶 길찾기</a>
-      ${r.tel?`<a class="mini" href="tel:${r.tel.replace(/[^0-9]/g,'')}">📞</a>`:''}
       <button class="mini" data-del="${r.id}" title="목록에서 삭제">🗑</button>
     </div>
   </article>`;
@@ -1845,7 +1861,7 @@ $('#btnSheetTest').onclick = async ()=>{
 };
 $('#btnSheetPull').onclick = async ()=>{ SHEET_URL=$('#sheetUrl').value.trim(); await pullFromSheet(false); };
 $('#btnSaveBuild').onclick = ()=>{ SHEET_URL=$('#sheetUrl').value.trim(); buildConfiguredFile(); };
-$('#btnCopyOrigin').onclick = ()=>copyOrigin();
+$$('[data-copy-origin]').forEach(b=>b.onclick = ()=>copyOrigin());
 $('#expToggle').onclick = e=>{ const b=e.target.closest('[data-exp]'); if(!b) return; MY.exp=b.dataset.exp==='1'; syncExpToggle(); render(); };
 $('#btnCopyGs').onclick = ()=>{
   navigator.clipboard.writeText(GS_CODE).then(

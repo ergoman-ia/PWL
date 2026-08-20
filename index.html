@@ -159,7 +159,7 @@
     padding:7px 13px;min-height:36px;font-size:12.5px}
   .addr-row{display:flex;align-items:center;gap:8px}
   .addr-row .addr{flex:1;min-width:0}
-  .mini.tel-inline{flex:0 0 auto;display:none;align-items:center;
+  .mini.tel-inline{flex:0 0 auto;display:none;align-items:center;gap:5px;
     padding:7px 11px;min-height:36px;font-size:12px;white-space:nowrap}
   @media(hover:hover){.mini.rate:hover{background:var(--gold);color:#fff;border-color:var(--gold)}}
 
@@ -258,7 +258,9 @@
     .sub-long{display:none}                              /* 부제를 줄여 자리를 만든다 */
     .copy-sub{display:inline-flex;align-items:center;flex:0 0 auto;
       min-height:34px;padding:6px 11px;font-size:12px}   /* 도보 기준 바로 오른쪽 */
-    .mini.tel-inline{display:inline-flex;min-height:38px}   /* 주소 줄에 전화 버튼 노출 */
+    .mini.tel-inline{display:inline-flex;min-height:40px;min-width:44px;
+      justify-content:center;padding:8px 12px;font-size:15px}
+    .tel-inline .tel-num{display:none}                   /* 번호는 감추고 아이콘만 */
     .toolbar select{flex:1 1 calc(50% - 4px);min-width:0;padding:9px 10px}
     .fab-in .stamp{flex:1 1 100%;text-align:center}
     .count{margin-left:0;flex:1 1 100%}
@@ -1158,7 +1160,7 @@ function card(r){
       <span class="addr">${r.address?`📍 ${esc(r.address)}`:''}</span>
       ${r.zone?`<span class="admin-only">· ${esc(r.zone)}</span>`:''}
       ${r.tel?`<a class="mini tel-inline" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
-         data-tel="${esc(r.tel)}" title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:''}
+         data-tel="${esc(r.tel)}" title="${esc(r.tel)}"><span class="ico">📞</span><span class="tel-num">${esc(r.tel)}</span></a>`:''}
     </div>
     ${r.note?`<div class="c-meta"><span style="color:var(--warn)">⚠ ${esc(r.note)}</span></div>`:''}
 

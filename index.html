@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>교육원 주변 식당 찾기 (도보 기준) | 산업안전보건교육원</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#16191d; --ink2:#5b6572; --ink3:#8b95a3;
+    --line:#e3e7ec; --line2:#eef1f5;
+    --brand:#1e5eff; --brand-soft:#e8efff;
+    --ok:#0b8a4b; --ok-soft:#e3f6ec;
+    --warn:#b06f00; --warn-soft:#fdf1dc;
+    --bad:#c02626; --bad-soft:#fdeaea;
+    --gold:#f0a202;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 4px 14px rgba(16,24,40,.06);
+    --r:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1216; --card:#171b21; --ink:#eef1f5; --ink2:#a8b2bf; --ink3:#78828f;
+      --line:#262c34; --line2:#20252c;
+      --brand:#6f9bff; --brand-soft:#1b2740;
+      --ok:#4ed08a; --ok-soft:#11291d;
+      --warn:#e8b45c; --warn-soft:#2b2413;
+      --bad:#ff7b7b; --bad-soft:#2e1717;
+      --gold:#ffc043;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  /* 관리자 기능은 주소 뒤에 #admin 을 붙여 연 기기에서만 보인다 */
+  body:not(.admin) .admin-only{display:none !important}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  button,a,.chip,.opt,.mini,.tab{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  body.locked{overflow:hidden}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",sans-serif;
+    -webkit-text-size-adjust:100%; line-height:1.5;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px 100px}
+
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--line);padding:13px 0 0}
+  .hd-in{max-width:980px;margin:0 auto;padding:0 16px}
+  .title{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  h1{font-size:19px;margin:0;letter-spacing:-.4px}
+  .sub{font-size:12.5px;color:var(--ink2)}
+  .sub-row{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+  .copy-sub{display:none}
+  .origin{margin-top:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+  .pin{display:inline-flex;align-items:center;gap:5px;background:var(--brand-soft);color:var(--brand);padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px}
+  .searchbar{display:flex;gap:8px;margin:11px 0 9px}
+  .searchbar input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:11px 13px;border-radius:11px;font-size:14.5px;outline:none;font-family:inherit}
+  .searchbar input:focus{border-color:var(--brand)}
+  .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px;border-radius:11px;font-size:13.5px;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap;transition:.12s}
+  @media(hover:hover){.btn:hover{border-color:var(--brand);color:var(--brand)}}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  @media(hover:hover){.btn.primary:hover{opacity:.9;color:#fff}}
+  .btn.sm{padding:7px 11px;font-size:12.5px;border-radius:9px}
+  #toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translate(-50%,14px);z-index:9999;
+    background:var(--ink);color:#fff;padding:11px 16px;border-radius:11px;font-size:13px;font-weight:600;
+    max-width:min(92vw,420px);text-align:center;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+  #toast.on{opacity:1;transform:translate(-50%,0)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 11px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:600;transition:.12s}
+  .chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+  .chip .n{opacity:.65;margin-left:4px;font-size:11.5px;font-weight:500}
+
+  /* ---------- 기준선: 구내식당 ---------- */
+  .base{
+    background:linear-gradient(135deg,var(--brand-soft),var(--card) 70%);
+    border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;margin:14px 0 4px;
+    box-shadow:var(--shadow);
+  }
+  .base-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .base-t{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
+  .base-tag{font-size:11px;font-weight:800;background:var(--brand);color:#fff;padding:3px 8px;border-radius:7px}
+  .base-desc{font-size:12.5px;color:var(--ink2);margin-top:3px}
+  .base-body{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:11px}
+  .bigstar{display:flex;align-items:baseline;gap:6px}
+  .bigstar .v{font-size:26px;font-weight:800;letter-spacing:-1px}
+  .bigstar .s{color:var(--gold);font-size:14px;letter-spacing:1px}
+  .bigstar .c{font-size:12px;color:var(--ink3)}
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+  .metrics b{color:var(--ink);font-weight:800}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 12px;font-size:13px;color:var(--ink2)}
+  select{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit}
+  .count{margin-left:auto;font-size:12.5px;color:var(--ink3)}
+
+  /* ---------- cards ---------- */
+  .group-h{display:flex;align-items:center;gap:8px;margin:20px 2px 10px;font-size:12.5px;font-weight:700;color:var(--ink3);letter-spacing:.2px}
+  .group-h::after{content:"";flex:1;height:1px;background:var(--line)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:9px;transition:.15s}
+  .card.closed{opacity:.55}
+  .c-top{display:flex;align-items:flex-start;gap:8px}
+  .c-name{font-size:15.5px;font-weight:800;letter-spacing:-.3px;flex:1;min-width:0}
+  .cat{font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px;white-space:nowrap;background:var(--line2);color:var(--ink2)}
+  .cat[data-c="한식"]{background:#fff0e6;color:#b1541a}
+  .cat[data-c="중식"]{background:#ffe9e9;color:#b32626}
+  .cat[data-c="일식"]{background:#e7f0ff;color:#1e4fbe}
+  .cat[data-c="양식"]{background:#f0e9ff;color:#5c34ba}
+  .cat[data-c="고기·구이"]{background:#ffe8f0;color:#b32463}
+  .cat[data-c="분식·기타"]{background:#e6f7ef;color:#0d7a4b}
+  .cat[data-c="치킨·주점"]{background:#fdf3d8;color:#8f6200}
+  .cat[data-c="카페·디저트"]{background:#eaf3f6;color:#2b6d80}
+  @media (prefers-color-scheme: dark){
+    .cat[data-c="한식"]{background:#3a2415;color:#f0ac74}
+    .cat[data-c="중식"]{background:#3a1a1a;color:#ff9a9a}
+    .cat[data-c="일식"]{background:#16233d;color:#8fb4ff}
+    .cat[data-c="양식"]{background:#251a3d;color:#b79bff}
+    .cat[data-c="고기·구이"]{background:#3a1728;color:#ff9ac2}
+    .cat[data-c="분식·기타"]{background:#123024;color:#6fd8a6}
+    .cat[data-c="치킨·주점"]{background:#332612;color:#f0c46a}
+    .cat[data-c="카페·디저트"]{background:#152a31;color:#84c4d6}
+  }
+  .c-menu{font-size:13px;color:var(--ink2);line-height:1.45}
+  .c-meta{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:12.2px;color:var(--ink3)}
+  .c-meta b{font-weight:700;color:var(--ink2)}
+  .status{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px}
+  .status.ok{background:var(--ok-soft);color:var(--ok)}
+  .status.warn{background:var(--warn-soft);color:var(--warn)}
+  .status.bad{background:var(--bad-soft);color:var(--bad)}
+  .status.new{background:var(--brand-soft);color:var(--brand)}
+
+  /* 판단 배지 */
+  .verdict{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--line2);border-radius:10px;padding:8px 10px}
+  .vb{font-size:12px;font-weight:900;padding:4px 10px;border-radius:8px;white-space:nowrap;letter-spacing:-.2px}
+  .vb.go{background:var(--ok);color:#fff}
+  .vb.maybe{background:#2e7ad1;color:#fff}
+  .vb.same{background:var(--warn);color:#fff}
+  .vb.stay{background:var(--bad);color:#fff}
+  .vb.none{background:transparent;color:var(--ink3);border:1px dashed var(--line);font-weight:700}
+  .vmeta{font-size:12px;color:var(--ink2);font-weight:600}
+  .vmeta .dim{color:var(--ink3);font-weight:500}
+  .scores{display:flex;gap:10px;flex-wrap:wrap;font-size:11.8px;color:var(--ink3)}
+  .scores b{color:var(--ink2)}
+  .cmt{font-size:12px;color:var(--ink2);background:var(--line2);border-radius:9px;padding:7px 9px;line-height:1.5}
+  .cmt .who{color:var(--ink3);font-size:11px}
+  .lnk{background:none;border:0;color:var(--brand);font-size:11.8px;font-weight:700;cursor:pointer;padding:0;font-family:inherit}
+
+  .c-act{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;padding-top:10px;border-top:1px solid var(--line2)}
+  .mini{flex:1;text-align:center;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:7px 6px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;transition:.12s;min-width:56px}
+  @media(hover:hover){.mini:hover{border-color:var(--brand);color:var(--brand)}}
+  .mini[data-del]{flex:0 0 auto;min-width:0;padding:7px 10px}
+  @media(hover:hover){.mini[data-del]:hover{border-color:var(--bad);color:var(--bad)}}
+  .mini.go{background:var(--brand);border-color:var(--brand);color:#fff}
+  @media(hover:hover){.mini.go:hover{opacity:.9;color:#fff}}
+  .mini.rate{background:var(--card);border-color:var(--gold);color:var(--gold)}
+  .mini.busy{opacity:.55;pointer-events:none}
+  .mini.rate-top{flex:0 0 auto;display:inline-flex;align-items:center;
+    padding:7px 13px;min-height:36px;font-size:12.5px}
+  .addr-row{display:flex;align-items:center;gap:8px}
+  .addr-row .addr{flex:1;min-width:0}
+  .mini.tel-inline{flex:0 0 auto;display:none;align-items:center;gap:5px;
+    padding:7px 11px;min-height:36px;font-size:12px;white-space:nowrap}
+  @media(hover:hover){.mini.rate:hover{background:var(--gold);color:#fff;border-color:var(--gold)}}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px}
+
+  /* ---------- modal ---------- */
+  .mask{position:fixed;inset:0;background:rgba(10,14,20,.55);z-index:80;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+  .mask.on{display:flex}
+  @media(min-width:700px){.mask{align-items:center}}
+  .panel{background:var(--card);width:100%;max-width:640px;max-height:90vh;max-height:90dvh;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:18px 18px 0 0;padding:20px 18px 26px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
+  @media(min-width:700px){.panel{border-radius:18px}}
+  .panel h2{margin:0 0 4px;font-size:17px;letter-spacing:-.3px}
+  .panel .lead{font-size:13px;color:var(--ink2);margin:0 0 16px;line-height:1.6}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--line2);padding:4px;border-radius:11px}
+  .tab{flex:1;border:0;background:transparent;color:var(--ink2);padding:8px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:5px;color:var(--ink2)}
+  .field input[type=text],.field input[type=password],.field select,.field textarea{
+    width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:10px;font-size:13.5px;font-family:inherit;outline:none;resize:vertical}
+  .field .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.5}
+  .field .hint a{color:var(--brand)}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:22px 14px;text-align:center;color:var(--ink2);font-size:13px;cursor:pointer;transition:.12s;background:var(--bg)}
+  .drop.over{border-color:var(--brand);color:var(--brand)}
+  @media(hover:hover){.drop:hover{border-color:var(--brand);color:var(--brand)}}
+  .log{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;max-height:200px;overflow:auto;margin-top:12px;line-height:1.65;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-all}
+  .log .g{color:var(--ok)} .log .r{color:var(--bad)} .log .y{color:var(--warn)}
+  .bar{height:6px;background:var(--line2);border-radius:99px;overflow:hidden;margin-top:12px}
+  .bar>i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
+  .panel-act{display:flex;gap:8px;margin-top:16px}
+  .panel-act .btn{flex:1}
+  .note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.6;margin-bottom:14px}
+  .note.info{background:var(--brand-soft);color:var(--brand)}
+  .rev{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;margin-top:4px}
+  .rev-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:var(--bg)}
+  .rev-row .nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rev-row a{font-size:12px;color:var(--brand);text-decoration:none;font-weight:700}
+  .rev-row button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2);font-family:inherit}
+  .rev-row button.y{color:var(--ok)} .rev-row button.n{color:var(--bad)}
+  .rev-row button[aria-pressed="true"].y{background:var(--ok-soft);border-color:var(--ok)}
+  .rev-row button[aria-pressed="true"].n{background:var(--bad-soft);border-color:var(--bad)}
+
+  /* ---------- 설문 ---------- */
+  .q{margin-bottom:18px}
+  .q h3{margin:0 0 3px;font-size:14px;letter-spacing:-.2px}
+  .q .qs{font-size:12px;color:var(--ink3);margin:0 0 9px;line-height:1.5}
+  .opts{display:grid;gap:6px}
+  .opts.g5{grid-template-columns:repeat(5,1fr)}
+  .opts.g4{grid-template-columns:repeat(2,1fr)}
+  .opts.g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:560px){.opts.g5{grid-template-columns:repeat(3,1fr)}}
+  .opt{
+    border:1.5px solid var(--line);background:var(--bg);color:var(--ink2);border-radius:11px;
+    padding:11px 6px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;
+    text-align:center;line-height:1.35;transition:.12s;
+  }
+  .opt .e{display:block;font-size:18px;margin-bottom:3px}
+  @media(hover:hover){.opt:hover{border-color:var(--brand);color:var(--brand)}}
+  .opt[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+  .opt[aria-pressed="true"][data-tone="bad"]{background:var(--bad);border-color:var(--bad)}
+  .opt[aria-pressed="true"][data-tone="warn"]{background:var(--warn);border-color:var(--warn)}
+  .opt[aria-pressed="true"][data-tone="good"]{background:var(--ok);border-color:var(--ok)}
+  .stars{display:flex;gap:4px;align-items:center}
+  .stars button{border:0;background:none;font-size:24px;line-height:1;cursor:pointer;color:var(--line);padding:0 1px;transition:.1s}
+  .stars button.on{color:var(--gold)}
+  .starrow{display:flex;align-items:center;gap:12px;margin-bottom:9px;flex-wrap:wrap}
+  .starrow .lb{font-size:13px;font-weight:700;width:112px;flex:0 0 auto}
+  .starrow .lb small{display:block;font-weight:500;color:var(--ink3);font-size:11px}
+  .starrow .val{font-size:12px;color:var(--ink3);min-width:26px}
+
+  /* ---------- footer bar ---------- */
+  .fab{position:fixed;left:0;right:0;bottom:0;z-index:50;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .fab-in{max-width:980px;margin:0 auto;display:flex;gap:8px;align-items:center}
+
+  /* ── 모바일 대응 ─────────────────────────────────────────────
+     iOS Safari는 글자 16px 미만인 입력칸을 탭하면 화면을 자동 확대한다.
+     확대되면 되돌아오지 않아 레이아웃이 어긋나므로 16px로 올린다. */
+  @media(max-width:700px){
+    .searchbar input,
+    select,
+    .field input[type=text],.field input[type=password],.field select,.field textarea{
+      font-size:16px;
+    }
+    /* 스크롤 시 상단바를 접어 목록 보이는 영역을 넓힌다
+       (접기 전 321px → 접은 뒤 약 110px) */
+    header.compact .title,
+    header.compact .origin{
+      max-height:0;opacity:0;margin:0;overflow:hidden;
+      transition:max-height .18s ease,opacity .12s ease;
+    }
+    header.compact .searchbar{margin-top:0}
+    header .title,header .origin{transition:max-height .18s ease,opacity .12s ease;max-height:200px}
+    .mini.rate-top{padding:6px 12px;min-height:34px;font-size:12px}
+    .sub-long{display:none}                              /* 부제를 줄여 자리를 만든다 */
+    .copy-sub{display:inline-flex;align-items:center;flex:0 0 auto;
+      min-height:34px;padding:6px 11px;font-size:12px}   /* 도보 기준 바로 오른쪽 */
+    .mini.tel-inline{display:inline-flex;min-height:40px;min-width:44px;
+      justify-content:center;padding:8px 12px;font-size:15px}
+    .tel-inline .tel-num{display:none}                   /* 번호는 감추고 아이콘만 */
+    .toolbar select{flex:1 1 calc(50% - 4px);min-width:0;padding:9px 10px}
+    .fab-in .stamp{flex:1 1 100%;text-align:center}
+    .count{margin-left:0;flex:1 1 100%}
+    .mini{padding:10px 6px;font-size:13px}      /* 손가락 터치 영역 확보 */
+    .chip{min-height:44px;display:inline-flex;align-items:center;padding:0 14px}
+    .btn{min-height:46px}
+    .btn.sm{min-height:44px}
+    .mini{min-height:44px}
+    .opt{min-height:48px}
+    .opt{min-height:46px}
+    #toast{font-size:13.5px;padding:12px 16px}
+  }
+  .fab .stamp{font-size:11.5px;color:var(--ink3);flex:1;min-width:0;line-height:1.35}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ink3);margin-right:5px;vertical-align:middle}
+  .dot.on{background:var(--ok)}
+  footer{margin-top:28px;font-size:11.5px;color:var(--ink3);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
+  footer b{color:var(--ink2)}
+  code{background:var(--line2);padding:1px 5px;border-radius:5px;font-size:11.5px}
+  pre.code{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:11px;overflow:auto;max-height:260px;line-height:1.55}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-in">
+    <div class="title">
+      <h1>교육원 주변 식당 찾기</h1>
+      <span class="sub-row">
+        <span class="sub">교육생용<span class="sub-long"> · 구내식당 대비 평가 · 🚶 도보 기준</span></span>
+        <button class="btn sm copy-sub" data-copy-origin title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
+      </span>
+    </div>
+    <div class="origin admin-only">
+      <span class="pin">📍 기준점</span>
+      <span>교육원 정문</span>
+      <button class="btn sm" data-copy-origin title="울산광역시 중구 성안동 276 복사">📋 출발지 복사</button>
+    </div>
+    <div class="searchbar">
+      <input id="q" type="text" placeholder="상호 · 메뉴 · 동네로 검색 (예: 국밥, 짬뽕, 우정동)" autocomplete="off">
+      <button class="btn" id="btnAdd" title="식당 직접 추가">＋ 추가</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===== 기준선: 교육원 구내식당 ===== -->
+  <section class="base" id="baseCard"></section>
+
+  <div class="toolbar">
+    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="sortDist"> 거리순 정렬</label>
+    <label class="admin-only">거리
+      <select id="radius">
+        <option value="1">1km 이내 (도보 약 13분)</option>
+        <option value="2">2km 이내 (도보 약 26분) · 전수</option>
+        <option value="5">5km 이내</option>
+        <option value="99" selected>전체</option>
+      </select>
+    </label>
+    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="hideClosed" checked> 폐업 숨기기</label>
+    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="onlyRated"> 평가 있는 곳만</label>
+    <label class="admin-only" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="showAll"> 표본 무시하고 전체</label>
+    <button class="btn sm admin-only" id="btnReshuffle" title="2km 밖 표본을 다시 뽑습니다">🎲 다시 섞기</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="list"></div>
+
+  <footer>
+    <p><b>판단 배지 읽는 법</b> — 교육원 구내식당을 <b>기준(0점)</b>으로 두고, 구내식당을 먹어본 교육생의 비교 응답(−2 ~ +2)과 먹어보지 않은 교육생의 추천 응답을 함께 환산한 값입니다. <b>＋1.0 이상 = 나갈 만함</b>, <b>＋0.3 ~ ＋1.0 = 가볼 만함</b>, <b>±0.3 = 구내식당과 비슷</b>, <b>−0.3 미만 = 구내식당 권장</b>. 응답 3명 미만은 「표본 적음」으로 함께 표시됩니다.</p>
+    <p><b>거리 표기</b> — 도로명주소 기준 직선 추정치입니다. 실제 이동 시간은 [길찾기]로 확인하세요. 점심시간 내 왕복 가능성은 거리 기준 참고값입니다.</p>
+    <p><b>목록 출처</b> — 공개 맛집 데이터베이스 기준 목록으로, 2026년 8월 웹 검색으로 영업 여부를 일괄 점검·갱신했습니다. 영업 여부는 [업데이트]로 행정안전부 인허가 데이터와 대조해 최신화하세요.</p>
+    <p><b>저장</b> — 평가는 Firebase(Firestore)에 실시간으로 공유·누적됩니다. 이 기기에도 캐시되어 오프라인에서도 열람할 수 있고, 오프라인에서 남긴 평가는 연결되면 자동 전송됩니다. 같은 식당을 다시 평가하면 이전 평가가 <b>수정</b>됩니다.</p>
+  </footer>
+</div>
+
+<div class="fab">
+  <div class="fab-in">
+    <span class="stamp" id="stamp"></span>
+    <button class="btn sm admin-only" id="btnSetup">⚙ 설정</button>
+    <button class="btn sm admin-only" id="btnIO">백업/이관</button>
+    <button class="btn primary sm admin-only" id="btnUpdate">🔄 업데이트</button>
+  </div>
+</div>
+
+<!-- ===== 평가(설문) 모달 ===== -->
+<div class="mask" id="mRate">
+  <div class="panel" id="ratePanel"></div>
+</div>
+
+<!-- ===== 업데이트 모달 ===== -->
+<div class="mask" id="mUpdate">
+  <div class="panel">
+    <h2>영업 상태 최신화</h2>
+    <p class="lead">행정안전부 <b>지방행정 인허가 데이터(일반음식점)</b>와 현재 목록을 대조해, <b>폐업·말소</b>로 확인된 곳은 삭제하고 <b>영업 중</b>으로 확인된 곳은 그대로 둡니다.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" data-tab="file" role="tab" aria-selected="true">① 인허가 데이터 파일</button>
+      <button class="tab" data-tab="api"  role="tab" aria-selected="false">② 오픈API 호출</button>
+      <button class="tab" data-tab="man"  role="tab" aria-selected="false">③ 수동 확인</button>
+    </div>
+    <section data-pane="file">
+      <div class="note">인증키·서버 없이 가장 확실하게 동작하는 방법입니다. 브라우저 보안(CORS·혼합콘텐츠) 제약을 받지 않습니다.</div>
+      <ol style="font-size:12.5px;color:var(--ink2);line-height:1.85;padding-left:18px;margin:0 0 14px">
+        <li><a href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EC%9D%BC%EB%B0%98%EC%9D%8C%EC%8B%9D%EC%A0%90%20%EC%9D%B8%ED%97%88%EA%B0%80" target="_blank" rel="noopener">공공데이터포털</a>에서 <b>「지방행정 인허가 – 일반음식점」</b> 또는 <a href="https://www.localdata.go.kr/" target="_blank" rel="noopener">LOCALDATA</a>에서 <b>울산광역시 중구</b> 데이터를 내려받습니다. (CSV 또는 JSON)</li>
+        <li>내려받은 파일을 아래에 올립니다. <b>사업장명 · 영업상태 · 주소</b> 열을 자동으로 찾아냅니다.</li>
+      </ol>
+      <div class="drop" id="drop">📂 CSV / JSON 파일을 여기에 끌어놓거나 클릭해서 선택
+        <div style="font-size:11.5px;margin-top:6px;color:var(--ink3)">CP949(EUC-KR) 인코딩 CSV도 자동 처리</div>
+      </div>
+      <input type="file" id="fileIn" accept=".csv,.json,.txt" hidden>
+    </section>
+    <section data-pane="api" hidden>
+      <div class="note">공공 API 서버는 브라우저 직접 호출(CORS)을 막아두는 경우가 많습니다. 실패하면 ①번 파일 방식을 쓰시거나 프록시 주소를 넣어 주세요.</div>
+      <div class="field"><label for="apiPreset">API 종류</label>
+        <select id="apiPreset">
+          <option value="localdata">LOCALDATA 오픈API (localdata.go.kr)</option>
+          <option value="datago">공공데이터포털 (data.go.kr) — 엔드포인트 직접 입력</option>
+          <option value="custom">직접 만든 주소 사용</option>
+        </select>
+      </div>
+      <div class="field" id="fEndpoint" hidden><label for="apiEndpoint">엔드포인트 URL</label>
+        <input type="text" id="apiEndpoint" placeholder="https://apis.data.go.kr/... (물음표 앞까지)">
+      </div>
+      <div class="field"><label for="apiKey">인증키 (serviceKey / authKey)</label>
+        <input type="password" id="apiKey" placeholder="발급받은 키를 붙여넣기" autocomplete="off">
+        <div class="hint">키는 창을 닫으면 사라지며 조회 요청 외에는 전송·저장되지 않습니다.</div>
+      </div>
+      <div class="field"><label for="apiProxy">프록시 주소 (선택)</label><input type="text" id="apiProxy" placeholder="예: https://내프록시/fetch?url="></div>
+      <div class="field"><label for="apiLocal">지자체코드 (울산 중구)</label><input type="text" id="apiLocal" value="3690000"></div>
+      <button class="btn primary" id="btnApiRun" style="width:100%">인허가 데이터 조회 후 대조</button>
+    </section>
+    <section data-pane="man" hidden>
+      <div class="note">[검색]으로 영업 여부를 확인한 뒤 ✓ / ✕ 를 눌러주세요. ✕ 표시한 곳은 [적용] 시 삭제됩니다.</div>
+      <div class="rev" id="revList"></div>
+      <div class="panel-act">
+        <button class="btn" id="btnManAllOk">모두 ✓ 로 표시</button>
+        <button class="btn primary" id="btnManApply">적용</button>
+      </div>
+    </section>
+    <div class="bar" id="bar" hidden><i></i></div>
+    <div class="log" id="log" hidden></div>
+    <div class="panel-act"><button class="btn" data-close style="flex:1">닫기</button></div>
+  </div>
+</div>
+
+<!-- ===== 설정 모달 ===== -->
+<div class="mask" id="mSetup">
+  <div class="panel">
+    <h2>설정</h2>
+    <p class="lead">이 기기에서의 사용 방식입니다. 평가는 Firebase에 실시간으로 공유·누적됩니다.</p>
+
+    <div class="note info" id="fbStat"></div>
+
+    <div class="field">
+      <label>길찾기에 사용할 지도</label>
+      <div class="opts g2" id="mapProviderToggle">
+        <button class="opt" data-prov="kakao">🟡 카카오맵<small style="display:block;font-weight:500;font-size:11px;opacity:.8">카카오맵으로 열기</small></button>
+        <button class="opt" data-prov="naver">🟢 네이버지도<small style="display:block;font-weight:500;font-size:11px;opacity:.8">네이버지도로 열기</small></button>
+      </div>
+      <div class="hint">모바일에서는 선택한 지도 앱으로 도보 경로를 바로 엽니다. 데스크톱에서는 웹 지도를 열고 출발지 주소를 클립보드에 복사합니다.</div>
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="nick">내 표시 이름 (선택)</label>
+      <input type="text" id="nick" placeholder="예: 9월 기본과정 김OO">
+      <div class="hint">한줄평 옆에 표시됩니다. 비워두면 '익명'으로 등록됩니다.</div>
+    </div>
+
+    <div class="field">
+      <label>내 구내식당 이용 경험</label>
+      <div class="opts g2" id="expToggle">
+        <button class="opt" data-exp="1">🍚 먹어봤습니다<small style="display:block;font-weight:500;font-size:11px;opacity:.8">구내식당과 비교해서 평가</small></button>
+        <button class="opt" data-exp="0">🙅 아직 없습니다<small style="display:block;font-weight:500;font-size:11px;opacity:.8">추천 여부로 평가</small></button>
+      </div>
+      <div class="hint">경험 여부에 따라 설문 문항이 바뀝니다. 언제든 다시 바꿀 수 있습니다.</div>
+    </div>
+
+    <div class="panel-act">
+      <button class="btn" id="btnAdminOff">관리자 모드 끄기</button>
+      <button class="btn primary" data-close style="flex:1">닫기</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 추가 모달 ===== -->
+<div class="mask" id="mAdd">
+  <div class="panel" style="max-width:480px">
+    <h2>식당 추가</h2>
+    <p class="lead">목록에 없는 곳을 직접 등록합니다.</p>
+    <div class="field"><label>상호명 *</label><input type="text" id="aName"></div>
+    <div class="field"><label>업종 *</label><select id="aCat"></select></div>
+    <div class="field"><label>대표 메뉴</label><input type="text" id="aMenu" placeholder="예: 돼지국밥, 수육"></div>
+    <div class="field"><label>주소</label><input type="text" id="aAddr" placeholder="울산광역시 중구 ..."></div>
+    <div class="field"><label>전화번호</label><input type="text" id="aTel"></div>
+    <div class="field"><label>기준점(성안동 276)에서 도보 거리(km)</label><input type="text" id="aDist" placeholder="예: 0.8"></div>
+    <div class="panel-act">
+      <button class="btn" data-close>취소</button>
+      <button class="btn primary" id="btnAddSave">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 저장/복원 모달 ===== -->
+<div class="mask" id="mIO">
+  <div class="panel" style="max-width:480px">
+    <h2>백업 · 이관</h2>
+    <p class="lead">현재 목록과 평가 전체를 JSON 파일로 백업하거나, 예전 파일 배포판에서 [내보내기]했던 평가를 Firebase로 올립니다. 이미 있는 평가는 건너뛰므로 여러 번 실행해도 안전합니다.</p>
+    <div class="panel-act" style="margin-top:0">
+      <button class="btn primary" id="btnExport">백업 내려받기</button>
+      <button class="btn" id="btnMigrate">📥 예전 평가 이관</button>
+    </div>
+    <input type="file" id="mgFile" accept=".json" multiple hidden>
+    <div class="log" id="ioLog" hidden></div>
+    <div class="panel-act"><button class="btn" data-close style="flex:1">닫기</button></div>
+
+  </div>
+</div>
+
+<script type="module">
+/* =========================================================================
+   ★ 배포 설정 (설치가이드 3단계)
+   Firebase 콘솔의 웹앱 구성에서 apiKey~appId 값을 아래 따옴표 안에 채우세요.
+   콘솔이 주는 `const firebaseConfig = { ... }` 블록을 통째로 붙여넣어
+   변수명이 firebaseConfig 로 바뀌어도 자동으로 인식합니다.
+   단, 콘솔 코드의 import ... / initializeApp(...) 줄은 붙여넣지 마세요.
+   비워두면 '기기 저장 모드'로 동작하며 평가가 이 기기에만 저장됩니다.
+   ========================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCsnW88GMok05Z_q_Tt3pFZgrxFWAlRU24",
+  authDomain: "restaurants-6d7a6.firebaseapp.com",
+  projectId: "restaurants-6d7a6",
+  storageBucket: "restaurants-6d7a6.firebasestorage.app",
+  messagingSenderId: "210688205068",
+  appId: "1:210688205068:web:d473365881fd279723e929"
+};
+
+/* 어떤 이름으로 붙여넣었든 설정을 찾아낸다 (FIREBASE_CONFIG / firebaseConfig / window.firebaseConfig) */
+function resolveFirebaseConfig(){
+  try{ if(typeof FIREBASE_CONFIG!=='undefined' && FIREBASE_CONFIG && FIREBASE_CONFIG.projectId) return FIREBASE_CONFIG; }catch(e){}
+  try{ if(typeof firebaseConfig!=='undefined' && firebaseConfig && firebaseConfig.projectId) return firebaseConfig; }catch(e){}
+  try{ if(window.firebaseConfig && window.firebaseConfig.projectId) return window.firebaseConfig; }catch(e){}
+  return null;
+}
+let FB_CFG = null;                 // initFirebase 에서 확정
+
+/* =========================================================================
+   0. 기준점 / 상수
+   ========================================================================= */
+const ORIGIN = {
+  name:'교육원 정문',
+  addr:'울산광역시 중구 성안동 276',
+  lat:35.5641222, lng:129.3215835      /* 성안동 276 = 교육원 정문 */
+};
+
+/* 길찾기에 사용할 지도 서비스: 'kakao' | 'naver' */
+let MAP_PROVIDER = 'kakao';
+
+/* 도보 기준 */
+const WALK_MIN_PER_KM = 13;     // 도보 소요시간 환산계수 (약 4.6km/h)
+const CATS = ['한식','중식','일식','양식','고기·구이','분식·기타','치킨·주점','카페·디저트'];
+const CANTEEN = { id:'canteen', name:'교육원 구내식당', desc:'산업안전보건교육원 구내식당 · 모든 비교의 기준점' };
+
+/* 비교 5단계 (구내식당 경험자) */
+const CMP_OPTS = [
+  {v:-2, e:'😞', t:'훨씬 못함', tone:'bad'},
+  {v:-1, e:'🙁', t:'조금 못함', tone:'warn'},
+  {v: 0, e:'😐', t:'비슷함',   tone:'warn'},
+  {v: 1, e:'🙂', t:'조금 나음', tone:'good'},
+  {v: 2, e:'😍', t:'훨씬 나음', tone:'good'}
+];
+/* 추천 4단계 (구내식당 경험 없음) */
+const REC_OPTS = [
+  {v:4, e:'🌟', t:'적극 추천', tone:'good'},
+  {v:3, e:'👍', t:'추천',     tone:'good'},
+  {v:2, e:'😐', t:'보통',     tone:'warn'},
+  {v:1, e:'👎', t:'비추천',   tone:'bad'}
+];
+/* 추천 응답 → 비교 척도 환산 */
+const REC2CMP = {4:1.8, 3:0.8, 2:-0.2, 1:-1.6};
+
+const ASPECTS = [
+  {k:'taste', t:'맛·만족도', s:'음식 자체가 어땠나요'},
+  {k:'price', t:'가격 대비', s:'값어치를 하나요'},
+  {k:'speed', t:'점심시간 내', s:'왕복·대기까지 감당되나요'}
+];
+
+/* =========================================================================
+   1. 초기 데이터
+   ========================================================================= */
+const SEED = [
+ {name:"함양집 종가점",category:"한식",menu:"육회비빔밥, 소고기국밥, 수육",address:"울산광역시 중구 복산동 278-12",tel:"052-274-0100",dist:1.02,zone:"혁신도시",lat:35.5686104,lng:129.3286957,geo:true},
+ {name:"채가 신촌설렁탕",category:"한식",menu:"설렁탕, 도가니탕, 삼계탕",address:"울산광역시 중구 종가8길 47 1층",tel:"",dist:0.99,zone:"혁신도시",lat:35.5683376,lng:129.3286238,geo:true},
+ {name:"카페베네 울산우정혁신도시점",category:"카페·디저트",menu:"커피, 빙수, 젤라또",address:"울산광역시 중구 종가8길 47 2층",tel:"052-282-5959",dist:0.98,zone:"혁신도시",lat:35.5684446,lng:129.3284697,geo:true,status:"warn",note:"최근 영업 흔적 없음(2026.8) — 확인 필요"},
+ {name:"미가현영천한우",category:"고기·구이",menu:"한우 구이, 육회, 버섯불고기",address:"울산광역시 중구 종가8길 35",tel:"052-288-9292",dist:0.84,zone:"혁신도시",lat:35.5677246,lng:129.3275125,geo:true},
+ {name:"보쿠산",category:"일식",menu:"장어덮밥, 돈까스, 새우튀김",address:"울산광역시 중구 송골2길 17-3 1층",tel:"",dist:0.56,zone:"혁신도시",lat:35.565366,lng:129.3262888,geo:true},
+ {name:"미락식당",category:"한식",menu:"백반, 녹두전",address:"울산광역시 중구 복산동 184-20",tel:"052-294-9933",dist:1.43,zone:"복산동",lat:35.5687078,lng:129.3328844,geo:true},
+ {name:"예가네숯불갈비",category:"고기·구이",menu:"돼지갈비, 보리밥정식, 냉면",address:"울산광역시 중구 복산동",tel:"052-296-1866",dist:1.3,zone:"복산동",lat:35.5669814,lng:129.3325612,geo:true},
+ {name:"이디야커피 울산중구청점",category:"카페·디저트",menu:"커피, 흑당 버블밀크티",address:"울산광역시 중구 화합로 489",tel:"052-707-0221",dist:1.35,zone:"복산동",lat:35.5675839,lng:129.3327569,geo:true},
+ {name:"투썸플레이스 울산우정혁신도시점",category:"카페·디저트",menu:"커피, 조각케이크",address:"울산광역시 중구 종가로 310",tel:"052-244-7200",dist:1.17,zone:"혁신도시",lat:35.5639149,lng:129.3112029,geo:true,status:"warn",note:"지점명 변경 가능성(유곡점) — 확인 필요"},
+ {name:"스컹크웍스 우정점",category:"카페·디저트",menu:"커피, 브런치",address:"울산광역시 중구 우정동 500-9",tel:"070-7818-8787",dist:1.13,zone:"혁신도시",lat:35.563149,lng:129.3116254,geo:true,status:"warn",note:"2022년 이후 영업 흔적 없음 — 확인 필요"},
+ {name:"로즈모스",category:"양식",menu:"파스타, 리조또, 피자, 브런치",address:"울산광역시 중구 우정동 500-12 KL빌딩 10층",tel:"052-245-0852",dist:1.25,zone:"혁신도시",lat:35.5629491,lng:129.3106669,geo:true},
+ {name:"황금향로",category:"고기·구이",menu:"한우 양념갈비, 점심특선",address:"울산광역시 중구 종가6길 11",tel:"052-244-8585",dist:0.99,zone:"혁신도시",lat:35.5633278,lng:129.3128444,geo:true},
+ {name:"수림복국",category:"한식",menu:"복국, 복수육",address:"울산광역시 중구 종가6길 26 유성프라자 8층",tel:"052-224-0235",dist:1.18,zone:"혁신도시",lat:35.5630028,lng:129.3112811,geo:true},
+ {name:"더다이닝원 울산점",category:"양식",menu:"뷔페, 초밥, 디저트",address:"울산광역시 중구 종가로 310 9층",tel:"052-242-0334",dist:1.21,zone:"혁신도시",lat:35.5637797,lng:129.3108466,geo:true},
+ {name:"소울식당",category:"한식",menu:"찌개, 제육볶음",address:"울산광역시 중구 종가로 313",tel:"070-7607-0967",dist:1.2,zone:"혁신도시",lat:35.5646884,lng:129.3110283,geo:true},
+ {name:"59참숯구이 혁신직영점",category:"고기·구이",menu:"돼지갈비, 곱창, 무한리필",address:"울산광역시 중구 종가6길 7 더테라스 2층",tel:"0507-1480-1267",dist:0.99,zone:"혁신도시",lat:35.5638009,lng:129.3128251,geo:true},
+ {name:"채선당한가득 우정혁신점",category:"한식",menu:"샤브샤브, 월남쌈",address:"울산광역시 중구 우정동 511-1",tel:"052-245-4949",dist:1.0,zone:"혁신도시",lat:35.5641233,lng:129.3127172,geo:true},
+ {name:"제이앤제이카페&맥주",category:"치킨·주점",menu:"맥주, 안주, 커피",address:"울산광역시 중구 종가로 313 타워더모스트 3층",tel:"052-246-8808",dist:1.21,zone:"혁신도시",lat:35.564825,lng:129.3109398,geo:true},
+ {name:"텐퍼센트커피 우정혁신아이파크점",category:"카페·디저트",menu:"아메리카노, 카푸치노",address:"울산광역시 중구 우정2길 52",tel:"052-700-1050",dist:1.25,zone:"혁신도시",lat:35.5617711,lng:129.3109431,geo:true},
+ {name:"예향정 우정혁신점",category:"한식",menu:"제육볶음, 참치찌개, 된장찌개",address:"울산광역시 중구 유곡동",tel:"052-245-3537",dist:2.85,zone:"유곡동",lat:35.5601521,lng:129.2968723,geo:true},
+ {name:"육대장 울산우정혁신도시점",category:"한식",menu:"육개장, 육칼면, 떡만두국",address:"울산광역시 중구 종가2길 43",tel:"052-248-9988",dist:3.25,zone:"유곡동",lat:35.5592823,lng:129.293492,geo:true},
+ {name:"콩분식",category:"분식·기타",menu:"떡볶이, 김밥, 순대, 튀김",address:"울산광역시 중구 종가3길 24 104호",tel:"",dist:2.83,zone:"유곡동",lat:35.5603212,lng:129.2970262,geo:true},
+ {name:"이디야커피 울산종가점",category:"카페·디저트",menu:"커피, 베이커리",address:"울산광역시 중구 종가5길 78-2",tel:"052-212-1135",dist:3.06,zone:"유곡동",lat:35.559416,lng:129.2951272,geo:true},
+ {name:"꿀밤식당",category:"한식",menu:"보리비빔밥, 대빵 계란말이, 된장찌개",address:"울산광역시 중구 함월14길 9",tel:"052-243-0555",dist:1.88,zone:"성안·함월",lat:35.5751807,lng:129.312062,geo:true},
+ {name:"소울메이트",category:"양식",menu:"파스타, 에그베네딕트, 피자",address:"울산광역시 중구 성안동 506-3",tel:"052-211-6060",dist:1.54,zone:"성안·함월",lat:35.5748871,lng:129.3183387,geo:true},
+ {name:"녹음",category:"양식",menu:"파니니, 파스타, 브런치",address:"울산광역시 중구 성안12길",tel:"0507-1483-8233",dist:2.18,zone:"성안·함월",lat:35.5797476,lng:129.3203842,geo:true},
+ {name:"종로쭈꾸미 성안본점",category:"한식",menu:"쭈꾸미볶음, 계란찜, 피자",address:"울산광역시 중구 성안로 201",tel:"052-243-3554",dist:1.99,zone:"성안·함월",lat:35.5781979,lng:129.3182435,geo:true},
+ {name:"스타벅스 울산성안점",category:"카페·디저트",menu:"커피, 디저트",address:"울산광역시 중구 성안동 472-9",tel:"052-212-3259",dist:1.94,zone:"성안·함월",lat:35.5778574,lng:129.3243798,geo:true},
+ {name:"뚜레쥬르 성안점",category:"카페·디저트",menu:"베이커리, 커피",address:"울산광역시 중구 성안동 484-4",tel:"052-243-9877",dist:1.84,zone:"성안·함월",lat:35.5772621,lng:129.3238017,geo:true},
+ {name:"백양칼국수",category:"한식",menu:"칼국수, 수제비, 부추전",address:"울산광역시 중구 복산동 703",tel:"052-242-0099",dist:0.05,zone:"성안·함월",lat:35.5639146,lng:129.3219422,geo:true},
+ {name:"텐퍼센트커피 울산비즈파크점",category:"카페·디저트",menu:"아메리카노, 라떼",address:"울산광역시 중구 종가로 406-21",tel:"052-716-1044",dist:0.06,zone:"성안·함월",lat:35.5637821,lng:129.3219734,geo:true},
+ {name:"흥덕제과 울산혁신점",category:"카페·디저트",menu:"소금빵, 캄파뉴, 샌드위치",address:"울산광역시 중구 우정동 500-1",tel:"052-911-0511",dist:1.23,zone:"혁신도시",lat:35.5632783,lng:129.3107232,geo:true},
+ {name:"크라운호프 울산우정혁신점",category:"치킨·주점",menu:"생맥주, 순살치킨, 나초",address:"울산광역시 중구 종가로 310",tel:"052-243-2548",dist:1.23,zone:"혁신도시",lat:35.5638265,lng:129.3106843,geo:true},
+ {name:"에뜨알베이커리",category:"카페·디저트",menu:"베이커리, 커피",address:"울산광역시 중구 복산동 185-6 1층",tel:"052-227-8388",dist:1.39,zone:"복산동",lat:35.5679101,lng:129.3329483,geo:true},
+ {name:"볼라오커피",category:"카페·디저트",menu:"커피, 케이크",address:"울산광역시 중구 성안6길 12",tel:"",dist:1.53,zone:"성안·함월",lat:35.5746067,lng:129.317392,geo:true},
+ {name:"텐퍼센트커피 성안농협사거리점",category:"카페·디저트",menu:"커피, 음료",address:"울산광역시 중구 성안로 191",tel:"070-7576-2685",dist:1.88,zone:"성안·함월",lat:35.5772735,lng:129.3176235,geo:true},
+ {name:"땅땅치킨호프",category:"치킨·주점",menu:"순살치킨, 생맥주",address:"울산광역시 중구 성안동",tel:"052-211-9299",dist:1.89,zone:"성안·함월",lat:35.5774919,lng:129.3183347,geo:true},
+ {name:"크라운호프 성안점",category:"치킨·주점",menu:"생맥주, 치킨, 피자",address:"울산광역시 중구 성안동 832-9",tel:"052-248-0016",dist:1.77,zone:"성안·함월",lat:35.5740796,lng:129.3118935,geo:true},
+ {name:"청춘미분식",category:"분식·기타",menu:"김밥, 떡볶이, 라면",address:"울산광역시 중구 성안동 853-5",tel:"052-244-6058",dist:2.2,zone:"성안·함월",lat:35.5756007,lng:129.3081567,geo:true},
+ {name:"85포크",category:"고기·구이",menu:"삼겹살, 돼지갈비",address:"울산광역시 중구 복산동 397-3",tel:"052-294-9008",dist:0.95,zone:"정문권",lat:35.5623379,lng:129.3297058,geo:true},
+ {name:"복산다방",category:"카페·디저트",menu:"소프트아이스크림, 팥빙수, 커피",address:"울산광역시 중구 송골7길 5",tel:"052-294-7562",dist:0.54,zone:"정문권",lat:35.5652922,lng:129.3261667,geo:true},
+ {name:"진이찬방 울산복산점",category:"한식",menu:"반찬, 백반",address:"울산광역시 중구 복산길 10",tel:"052-295-6668",dist:0.95,zone:"정문권",lat:35.5599566,lng:129.3282768,geo:true},
+ {name:"선하네가든",category:"한식",menu:"한식뷔페, 삼겹살",address:"울산광역시 중구 종가로 322",tel:"052-1551-5266",dist:1.07,zone:"2km권",lat:35.5642151,lng:129.3121239,geo:true},
+ {name:"경주집식당",category:"한식",menu:"오리탕, 김치찌개, 된장찌개",address:"울산광역시 중구 성안동 833-1",tel:"052-246-6957",dist:1.73,zone:"2km권",lat:35.5736347,lng:129.3116943,geo:true},
+ {name:"동구식당",category:"한식",menu:"동태탕, 두루치기, 순두부",address:"울산광역시 중구 성안동 823-1",tel:"052-221-7738",dist:1.9,zone:"2km권",lat:35.5752557,lng:129.3118244,geo:true},
+ {name:"성안한우마루식육식당",category:"고기·구이",menu:"한우 구이, 두루치기, 냉면",address:"울산광역시 중구 백양로 46",tel:"052-211-9204",dist:1.83,zone:"2km권",lat:35.5742029,lng:129.3112015,geo:true},
+ {name:"인생식당 울산성안점",category:"고기·구이",menu:"삼겹살, 김치찌개",address:"울산광역시 중구 성안로 194",tel:"052-245-6692",dist:1.89,zone:"2km권",lat:35.5774147,lng:129.3182267,geo:true},
+ {name:"365 축산물 식육식당",category:"고기·구이",menu:"한우 구이, 육회, 시래기된장찌개",address:"울산광역시 중구 성안로 198",tel:"052-900-5909",dist:1.9,zone:"2km권",lat:35.5775593,lng:129.3184268,geo:true},
+ {name:"성안쌈밥",category:"한식",menu:"쌈밥, 제육쌈밥",address:"울산광역시 중구 성안동 804-12",tel:"052-288-9803",dist:2.28,zone:"중거리",lat:35.5760857,lng:129.3078498,geo:true},
+ {name:"리에또피네",category:"양식",menu:"파스타, 뇨끼, 아란치니",address:"울산광역시 중구 함월3길 1 지하1층",tel:"010-7248-2541",dist:2.2,zone:"중거리",lat:35.5733054,lng:129.305758,geo:true},
+ {name:"배가한식",category:"한식",menu:"백반, 가정식",address:"울산광역시 중구 학산동 92-8",tel:"010-2909-4415",dist:0.98,zone:"정문권",lat:35.5584252,lng:129.3266885,geo:true},
+ {name:"대구분식",category:"분식·기타",menu:"칼국수, 수제비, 비빔밥",address:"울산광역시 중구 학성동 432-378",tel:"052-291-2180",dist:1.43,zone:"2km권",lat:35.5567423,lng:129.3303909,geo:true},
+ {name:"오대근짬뽕",category:"중식",menu:"짬뽕, 짜장면, 탕수육",address:"울산광역시 중구 학성1길 44-1",tel:"052-951-0668",dist:1.44,zone:"2km권",lat:35.5575533,lng:129.3314189,geo:true},
+ {name:"영하꿀갈비쌈밥",category:"한식",menu:"쌈밥, 돼지갈비, 떡갈비",address:"울산광역시 중구 학성동 377-12",tel:"052-292-5506",dist:1.46,zone:"2km권",lat:35.5576116,lng:129.3317377,geo:true},
+ {name:"산해진식당",category:"한식",menu:"생선구이, 동태탕, 막걸리",address:"울산광역시 중구 학성동 360-4",tel:"052-297-3651",dist:1.72,zone:"2km권",lat:35.5561651,lng:129.3332226,geo:true},
+ {name:"무영쌈밥",category:"한식",menu:"쌈밥, 삼겹살",address:"울산광역시 중구 함월6길 5-7",tel:"052-211-3788",dist:1.46,zone:"2km권",lat:35.572711,lng:129.3141913,geo:true},
+ {name:"함월반점",category:"중식",menu:"짜장면, 짬뽕",address:"울산광역시 중구 함월13길 46",tel:"",dist:1.88,zone:"2km권",lat:35.5771118,lng:129.3170698,geo:true},
+ {name:"정연탄구이",category:"고기·구이",menu:"연탄불고기, 김치찌개, 보리비빔밥",address:"울산광역시 중구 함월22길 7",tel:"052-962-9292",dist:2.03,zone:"중거리",lat:35.5783839,lng:129.3176278,geo:true},
+ {name:"달을품은집 함월당",category:"한식",menu:"한우 샤브칼국수, 갈비탕",address:"울산광역시 중구 성안동 805-11",tel:"052-246-1221",dist:2.08,zone:"중거리",lat:35.5753629,lng:129.3094223,geo:true},
+ {name:"태양칼국수",category:"한식",menu:"해물칼국수, 돈까스, 깻잎전",address:"울산광역시 중구 함월14길 54",tel:"052-988-2788",dist:2.28,zone:"중거리",lat:35.5789153,lng:129.3129015,geo:true},
+ {name:"솔밭가든",category:"한식",menu:"오리구이, 백숙",address:"울산광역시 중구 함월20길 65",tel:"052-243-5292",dist:2.38,zone:"중거리",lat:35.5812718,lng:129.3209957,geo:true},
+ {name:"함월재",category:"한식",menu:"한식",address:"울산광역시 중구 함월7길 17",tel:"010-3039-3240",dist:1.45,zone:"2km권",lat:35.5722441,lng:129.3135235,geo:true},
+ {name:"한양반점",category:"중식",menu:"간짜장, 탕수육, 볶음밥",address:"울산광역시 중구 학성동 156-14",tel:"052-297-7730",dist:2.14,zone:"중거리",lat:35.5532374,lng:129.3349402,geo:true},
+ {name:"엄지식육식당",category:"고기·구이",menu:"한우 구이, 차돌 샤브",address:"울산광역시 중구 학성동 469-8",tel:"052-297-1351",dist:2.02,zone:"중거리",lat:35.5531636,lng:129.3333725,geo:true},
+ {name:"굴다리손칼국수",category:"한식",menu:"칼국수, 석박지",address:"울산광역시 중구 젊음의3거리 13",tel:"",dist:1.48,zone:"2km권",lat:35.5535279,lng:129.3226384,geo:true},
+ {name:"땡초손칼국수",category:"한식",menu:"칼국수, 수제비",address:"울산광역시 중구 젊음의3거리 15",tel:"052-211-5118",dist:1.48,zone:"2km권",lat:35.5535315,lng:129.3227768,geo:true},
+ {name:"할매칼국수",category:"한식",menu:"칼국수, 콩국수",address:"울산광역시 중구 옥교동 120-31",tel:"052-245-1333",dist:1.26,zone:"2km권",lat:35.555197,lng:129.3237147,geo:true},
+ {name:"서울 손칼국수",category:"한식",menu:"손칼국수",address:"울산광역시 중구 번영로 325",tel:"",dist:1.34,zone:"2km권",lat:35.5546443,lng:129.3237285,geo:true},
+ {name:"봉계돼지국밥",category:"한식",menu:"돼지국밥, 수육",address:"울산광역시 중구 중앙길 91-2",tel:"052-246-4477",dist:1.22,zone:"2km권",lat:35.5557791,lng:129.3182393,geo:true},
+ {name:"궁중삼계탕",category:"한식",menu:"삼계탕, 인삼주",address:"울산광역시 중구 먹자거리 6",tel:"052-244-1156",dist:1.33,zone:"2km권",lat:35.554683,lng:129.3198606,geo:true},
+ {name:"이모집식당",category:"한식",menu:"낙곱새, 두루치기",address:"울산광역시 중구 젊음의1거리 38",tel:"052-246-1378",dist:1.44,zone:"2km권",lat:35.553742,lng:129.3211035,geo:true},
+ {name:"가미닭갈비913",category:"한식",menu:"닭갈비, 볶음밥",address:"울산광역시 중구 성남동 219-119",tel:"052-245-3007",dist:1.52,zone:"2km권",lat:35.5532815,lng:129.3197933,geo:true},
+ {name:"서양식당",category:"양식",menu:"파스타, 스테이크, 필라프",address:"울산광역시 중구 젊음의1거리 23",tel:"052-248-0029",dist:1.46,zone:"2km권",lat:35.5536857,lng:129.3200855,geo:true},
+ {name:"원조던지기탕",category:"한식",menu:"돌솥, 칼국수, 쫄면",address:"울산광역시 중구 성남동",tel:"",dist:1.29,zone:"2km권",lat:35.5548484,lng:129.3210697,geo:true},
+ {name:"떡볶이가좋다",category:"분식·기타",menu:"즉석떡볶이, 모듬사리, 볶음밥",address:"울산광역시 중구 중앙시장길 2-7",tel:"010-7382-7715",dist:1.25,zone:"2km권",lat:35.555132,lng:129.3220753,geo:true},
+ {name:"꼬순떡",category:"분식·기타",menu:"꼬치, 순대, 떡볶이",address:"울산광역시 중구 중앙길 127",tel:"052-243-2511",dist:1.14,zone:"2km권",lat:35.5559527,lng:129.3204723,geo:true},
+ {name:"오 분식",category:"분식·기타",menu:"분식",address:"울산광역시 중구 중앙길 233",tel:"",dist:0.97,zone:"정문권",lat:35.5579897,lng:129.3256232,geo:true},
+ {name:"한스애기김밥",category:"분식·기타",menu:"김밥, 떡볶이",address:"울산광역시 중구 성남동 178-2",tel:"052-221-1767",dist:1.25,zone:"2km권",lat:35.5557071,lng:129.3176332,geo:true},
+ {name:"이화원김밥",category:"분식·기타",menu:"계란김밥, 어묵",address:"울산광역시 중구 먹자거리 25",tel:"052-245-5005",dist:1.3,zone:"2km권",lat:35.5547596,lng:129.3210073,geo:true},
+ {name:"짱이야 성남점",category:"분식·기타",menu:"떡볶이, 미니김밥, 튀김",address:"울산광역시 중구 젊음의거리 29-10",tel:"052-245-6466",dist:1.43,zone:"2km권",lat:35.5541228,lng:129.3184416,geo:true},
+ {name:"소밀정원",category:"양식",menu:"브런치, 파스타, 샐러드",address:"울산광역시 중구 성남동 3-23",tel:"0507-1361-2602",dist:1.03,zone:"2km권",lat:35.5567632,lng:129.3208213,geo:true},
+ {name:"카페숨",category:"카페·디저트",menu:"핸드드립 커피, 라떼",address:"울산광역시 중구 옥교동 255-2",tel:"052-296-1446",dist:1.11,zone:"2km권",lat:35.5561112,lng:129.3217622,geo:true},
+ {name:"카페 머물다",category:"카페·디저트",menu:"커피, 케이크, 베이커리",address:"울산광역시 중구 성남동 228-13 1층",tel:"070-4115-0201",dist:1.35,zone:"2km권",lat:35.5545711,lng:129.3195596,geo:true},
+ {name:"엔젤리너스 강북로점",category:"카페·디저트",menu:"커피, 샌드위치",address:"울산광역시 중구 강북로 105",tel:"052-244-8588",dist:1.54,zone:"2km권",lat:35.5530301,lng:129.3215204,geo:true},
+ {name:"네모돼지돈까스",category:"일식",menu:"등심돈까스, 소바, 우동",address:"울산광역시 중구 문화의거리 5",tel:"",dist:1.18,zone:"2km권",lat:35.5556147,lng:129.3215647,geo:true},
+ {name:"메차쿠차",category:"일식",menu:"왕돈가스, 치즈돈까스",address:"울산광역시 중구 먹자거리 2",tel:"052-246-1055",dist:1.32,zone:"2km권",lat:35.5547648,lng:129.3195326,geo:true},
+ {name:"명장스시",category:"일식",menu:"초밥, 새우튀김 우동",address:"울산광역시 중구 학성로 85-1 1층",tel:"070-8987-7824",dist:1.24,zone:"2km권",lat:35.5552176,lng:129.3205225,geo:true},
+ {name:"은화수식당 울산성남점",category:"일식",menu:"돈까스, 유부우동, 떡볶이",address:"울산광역시 중구 젊음의거리 36",tel:"070-7724-1112",dist:1.5,zone:"2km권",lat:35.5535918,lng:129.3187009,geo:true},
+ {name:"백반",category:"한식",menu:"백반정식",address:"울산광역시 중구 옥교동 125-12",tel:"052-243-4888",dist:1.24,zone:"2km권",lat:35.5552916,lng:129.3229817,geo:true},
+ {name:"홍콩반점0410 울산성남점",category:"중식",menu:"짜장면, 짬뽕, 깐풍기",address:"울산광역시 중구 젊음의거리 54 2층",tel:"052-246-0939",dist:1.46,zone:"2km권",lat:35.5537045,lng:129.3198353,geo:true},
+ {name:"진상천",category:"중식",menu:"짬뽕, 탕수육",address:"울산광역시 중구 젊음의거리 41-1",tel:"052-937-7997",dist:1.44,zone:"2km권",lat:35.5539539,lng:129.3189694,geo:true},
+ {name:"북경손짜장",category:"중식",menu:"짜장면, 짬뽕",address:"울산광역시 중구 반구동",tel:"052-294-3331",dist:1.69,zone:"2km권",lat:35.5637834,lng:129.3365356,geo:true},
+ {name:"탕화쿵푸 반구점",category:"중식",menu:"마라탕, 마라샹궈",address:"울산광역시 중구 복산동 30-1",tel:"010-7900-7331",dist:1.43,zone:"2km권",lat:35.5627307,lng:129.3341222,geo:true},
+ {name:"스타벅스 울산번영로점",category:"카페·디저트",menu:"커피, 디저트",address:"울산광역시 중구 번영로 434",tel:"1522-3232",dist:1.27,zone:"2km권",lat:35.5616281,lng:129.3323601,geo:true},
+ {name:"파란풍차제과점 시계탑본점",category:"카페·디저트",menu:"단팥빵, 소금빵, 멜론빵",address:"울산광역시 중구 성남동",tel:"052-242-0404",dist:1.27,zone:"2km권",lat:35.554987,lng:129.3219136,geo:true},
+ {name:"빠삐용베이커리",category:"카페·디저트",menu:"소금빵, 멜론빵, 단팥빵",address:"울산광역시 중구 성남동 139",tel:"052-248-0250",dist:1.25,zone:"2km권",lat:35.5555063,lng:129.3184526,geo:true},
+ {name:"파리바게뜨 울산복산점",category:"카페·디저트",menu:"베이커리, 커피",address:"울산광역시 중구 중앙길 261",tel:"052-245-6565",dist:0.97,zone:"정문권",lat:35.5586965,lng:129.3269898,geo:true},
+ {name:"케익먹는곰",category:"카페·디저트",menu:"제철과일 케이크",address:"울산광역시 중구 서원5길 14",tel:"010-9706-7600",dist:1.69,zone:"2km권",lat:35.5622806,lng:129.3363583,geo:true},
+ {name:"비앤씨베이커리",category:"카페·디저트",menu:"베이커리",address:"울산광역시 중구 복산동 34-17 1층",tel:"052-988-0045",dist:1.75,zone:"2km권",lat:35.5613576,lng:129.336686,geo:true},
+ {name:"개성순대국밥",category:"한식",menu:"순대국밥, 순대",address:"울산광역시 중구 해오름5길 4",tel:"",dist:2.62,zone:"중거리",lat:35.5637077,lng:129.344753,geo:true,note:"2026.8 영업 확인 · 연내 영업 종료 소문 있음 — 방문 전 확인 권장"},
+ {name:"뚱이한우국밥",category:"한식",menu:"한우국밥, 육전",address:"울산광역시 중구 번영로 595",tel:"0507-1327-1096",dist:2.97,zone:"중거리",lat:35.5697396,lng:129.3468924,geo:true},
+ {name:"사발생국수 울산점",category:"한식",menu:"고기국수, 부추칼국수, 마약김밥",address:"울산광역시 중구 광남길 3 1층",tel:"052-298-9116",dist:2.5,zone:"중거리",lat:35.5685587,lng:129.3430393,geo:true},
+ {name:"올온",category:"분식·기타",menu:"키토김밥, 유부롤",address:"울산광역시 중구 반구정4길 75",tel:"052-961-2165",dist:2.74,zone:"중거리",lat:35.5591121,lng:129.3449992,geo:true},
+ {name:"복산육관",category:"고기·구이",menu:"한우 구이, 육회",address:"울산광역시 중구 평산2길 20 1층",tel:"052-296-9116",dist:2.35,zone:"중거리",lat:35.5682072,lng:129.341753,geo:true},
+ {name:"뒷고기육백",category:"고기·구이",menu:"뒷고기, 된장찌개, 볶음밥",address:"울산광역시 중구 광남1길 36",tel:"052-285-3190",dist:2.63,zone:"중거리",lat:35.5692454,lng:129.3440149,geo:true},
+ {name:"싸다김밥 울산남외동점",category:"분식·기타",menu:"김밥, 오므라이스, 떡볶이",address:"울산광역시 중구 광남길 8 1층",tel:"052-292-2737",dist:2.48,zone:"중거리",lat:35.5688799,lng:129.3427575,geo:true},
+ {name:"노곡회관 울산성남점",category:"고기·구이",menu:"삼겹살, 껍데기",address:"울산광역시 중구 옥골샘4길 23",tel:"0507-1338-2835",dist:0.99,zone:"정문권",lat:35.5572604,lng:129.3237628,geo:true},
+ {name:"불막열삼 울산성남점",category:"고기·구이",menu:"곱창, 갈비",address:"울산광역시 중구 젊음의거리 29-5",tel:"052-211-3705",dist:1.48,zone:"2km권",lat:35.5538557,lng:129.3181372,geo:true},
+ {name:"나폴레옹",category:"치킨·주점",menu:"치킨, 안주, 맥주",address:"울산광역시 중구 구교로 66",tel:"052-296-2789",dist:1.68,zone:"2km권",lat:35.5551811,lng:129.3315659,geo:true},
+ {name:"붕붕치킨호프",category:"치킨·주점",menu:"치킨, 맥주",address:"울산광역시 중구 성남동",tel:"052-244-9992",dist:1.53,zone:"2km권",lat:35.5532453,lng:129.3195577,geo:true},
+ {name:"작심한돈",category:"고기·구이",menu:"삼겹살, 목살, 항정살",address:"울산광역시 중구 태화동 486-11",tel:"010-8998-9766",dist:3.09,zone:"중거리",lat:35.5511588,lng:129.2994291,geo:true},
+ {name:"송백정",category:"한식",menu:"백숙, 오리",address:"울산광역시 중구 길촌길 256",tel:"052-245-5967",dist:3.98,zone:"중거리",lat:35.5761486,lng:129.289631,geo:true},
+ {name:"우아한 식판",category:"한식",menu:"볶음밥, 덮밥",address:"울산광역시 중구 남외동 405-5",tel:"",dist:2.39,zone:"중거리",lat:35.5715894,lng:129.3405819,geo:true},
+ {name:"한솥도시락 울산중구청입구점",category:"분식·기타",menu:"도시락",address:"울산광역시 중구 반구동 62-4",tel:"052-293-2252",dist:1.64,zone:"2km권",lat:35.5638195,lng:129.3360509,geo:true},
+ {name:"소풍분식",category:"분식·기타",menu:"김밥, 떡볶이, 순대",address:"울산광역시 중구 유곡동 469-2",tel:"052-244-1570",dist:3.12,zone:"중거리",lat:35.5601799,lng:129.2944234,geo:true},
+ {name:"서울분식",category:"분식·기타",menu:"분식",address:"울산광역시 중구 반구1동 781-6",tel:"052-291-3631",dist:2.97,zone:"중거리",lat:35.5555703,lng:129.3456156,geo:true},
+ {name:"갑진식당 울산점",category:"한식",menu:"갈비탕, 육회비빔밥, 냉면",address:"울산광역시 중구 반구1동 594-9",tel:"010-2952-7791",dist:2.98,zone:"중거리",lat:35.5541904,lng:129.3449378,geo:true},
+ {name:"할매손칼국시",category:"한식",menu:"칼국수, 충무김밥",address:"울산광역시 중구 서동 55-6",tel:"052-281-7602",dist:3.38,zone:"중거리",lat:35.5802861,lng:129.3438889,geo:true},
+ {name:"일품양평해장국 울산달빛로점",category:"한식",menu:"양평해장국",address:"울산광역시 중구 달빛로 25",tel:"052-296-3131",dist:2.87,zone:"중거리",lat:35.579335,lng:129.3388022,geo:true},
+ {name:"전통 양평해장국",category:"한식",menu:"양평해장국",address:"울산광역시 중구 화합로 414 1층",tel:"",dist:1.87,zone:"2km권",lat:35.562041,lng:129.337894,geo:true},
+ {name:"강원도해장국",category:"한식",menu:"황태해장국",address:"울산광역시 중구 서동 55-3",tel:"052-294-9400",dist:3.45,zone:"중거리",lat:35.5804485,lng:129.344512,geo:true},
+ {name:"정식당",category:"한식",menu:"갈비탕, 전복갈비탕, 돌솥밥, 갈비찜",address:"울산광역시 중구 종가8길 26",tel:"052-700-8080",dist:0.75,zone:"혁신도시",lat:35.567139,lng:129.3270608,geo:true},
+ {name:"심돈 울산우정혁신점",category:"고기·구이",menu:"삼겹살, 모듬한판구이, 솥밥",address:"울산광역시 중구 종가6길 8-18 럭키빌딩 1층",tel:"0507-1384-6265",dist:1.25,zone:"혁신도시",lat:35.563401,lng:129.3105469,geo:true},
+ {name:"디저트39 울산우정혁신점",category:"카페·디저트",menu:"크로와상, 도넛, 티라미수, 커피",address:"울산광역시 중구 종가6길 12 1층",tel:"0507-1442-3941",dist:1.03,zone:"혁신도시",lat:35.5632352,lng:129.3124982,geo:true},
+ {name:"갈바트카페 울산우정혁신점",category:"카페·디저트",menu:"아메리카노, 갈라페, 쿠키",address:"울산광역시 중구 종가6길 4-5 1층 108호",tel:"0503-5260-8269",dist:0.45,zone:"혁신도시",status:"warn",note:"폐업 가능성(브랜드 매장목록 미등재) — 방문 전 확인"},
+ {name:"굴이랑매생이",category:"한식",menu:"매생이굴국밥, 굴국밥, 돌솥비빔밥",address:"울산광역시 중구 종가5길 64 101호",tel:"0507-1317-9233",dist:0.5,zone:"혁신도시"},
+ {name:"가장맛있는족발 우정혁신점",category:"한식",menu:"족발, 보쌈, 쟁반국수, 매운족발",address:"울산광역시 중구 종가5길 67",tel:"052-246-1200",dist:0.5,zone:"혁신도시"},
+ {name:"우창해장국 울산점",category:"한식",menu:"우거지해장국, 황태해장국, 소내장탕, 설렁탕",address:"울산광역시 중구 종가5길 77-6 1층",tel:"0507-1467-8316",dist:0.55,zone:"혁신도시"},
+ {name:"스시카즈키",category:"일식",menu:"초밥세트, 사시미, 우동, 냉소바",address:"울산광역시 중구 종가2길 26 1층",tel:"0507-1435-2788",dist:0.6,zone:"혁신도시"},
+ {name:"스시미즈기와 우정혁신도시점",category:"일식",menu:"모듬초밥, 한판스시, 라멘, 우동",address:"울산광역시 중구 종가2길 48 1층",tel:"0507-1372-6535",dist:3.22,zone:"혁신도시",lat:35.5594656,lng:129.2936704,geo:true},
+ {name:"본가어탕 혁신도시점",category:"한식",menu:"어탕국밥, 어탕수제비, 어탕칼국수",address:"울산광역시 중구 종가2길 49",tel:"0507-1390-5311",dist:0.6,zone:"혁신도시"},
+ {name:"천안문",category:"중식",menu:"짜장면, 짬뽕, 볶음밥, 탕수육, 간짜장",address:"울산광역시 중구 종가1길 6",tel:"052-244-3033",dist:0.7,zone:"혁신도시"},
+ {name:"리코파스토",category:"양식",menu:"파스타, 피자, 스테이크, 리조또",address:"울산광역시 중구 종가1길 14 1층",tel:"0507-1341-7211",dist:0.7,zone:"혁신도시"},
+ {name:"티유",category:"카페·디저트",menu:"아메리카노, 프리미엄 홍차, 허브티",address:"울산광역시 중구 종가로 313 상가 2층 212호",tel:"0507-1380-1162",dist:0.7,zone:"혁신도시"},
+ {name:"쫀드기상회 우정혁신점",category:"분식·기타",menu:"쫀드기, 라면땅, 옛날핫도그",address:"울산광역시 중구 종가2길 1-2 105호",tel:"052-248-2777",dist:0.7,zone:"혁신도시"},
+ {name:"다이닝원 울산점",category:"일식",menu:"초밥뷔페, 사시미, 회전초밥",address:"울산광역시 중구 종가로 310 901~903호",tel:"0507-1412-0412",dist:0.8,zone:"혁신도시"},
+ {name:"궁민찌개",category:"한식",menu:"김치찌개, 제육볶음, 통오징어튀김",address:"울산광역시 중구 종가16길 8 1층",tel:"052-292-9202",dist:0.9,zone:"혁신도시",status:"warn",note:"최근 영업 흔적 없음(2026.8) — 확인 필요"},
+ {name:"다가치깨통닭 우정점",category:"치킨·주점",menu:"한마리통닭, 마늘찢닭, 똥집튀김",address:"울산광역시 중구 우정7길 25 1층",tel:"052-211-9282",dist:0.9,zone:"우정동"},
+ {name:"우정분식",category:"분식·기타",menu:"칼국수, 수제비, 칼제비, 비빔밥",address:"울산광역시 중구 우정6길 1",tel:"052-242-1050",dist:0.9,zone:"우정동"},
+ {name:"아몬드치킨 우정점",category:"치킨·주점",menu:"수제치킨, 후라이드, 양념, 마늘치킨",address:"울산광역시 중구 우정7길 45",tel:"052-246-0999",dist:0.95,zone:"우정동",status:"warn",note:"영업시간 확인 필요"},
+ {name:"스텔라떡볶이 우정태화점",category:"분식·기타",menu:"떡볶이, 닭떡볶이, 닭강정, 꼬마김밥",address:"울산광역시 중구 우정3길 4 1층",tel:"052-243-4691",dist:1.0,zone:"우정동",status:"warn",note:"브랜드 매장안내 미등재(2026.8) — 확인 필요"},
+ {name:"한우1번가",category:"고기·구이",menu:"한우모듬, 한우등심, 육회",address:"울산광역시 중구 우정2길 5",tel:"052-211-9281",dist:1.0,zone:"우정동",status:"warn",note:"최근 영업 흔적 없음(2026.8) — 확인 필요"},
+ {name:"친구포차",category:"치킨·주점",menu:"닭볶음탕, 골뱅이무침, 두루치기, 소라숙회",address:"울산광역시 중구 우정2길 30 1층",tel:"052-246-3151",dist:1.0,zone:"우정동"},
+ {name:"비룡",category:"중식",menu:"짜장면, 짬뽕, 간짜장, 탕수육, 볶음밥",address:"울산광역시 중구 우정4길 8 1층",tel:"0507-1340-0307",dist:1.0,zone:"우정동"},
+ {name:"화공",category:"중식",menu:"짬뽕, 짜장면, 탕수육, 깐쇼새우, 코스요리",address:"울산광역시 중구 종가25길 31 1층",tel:"0507-1339-4593",dist:1.1,zone:"혁신도시"},
+ {name:"생식본능",category:"고기·구이",menu:"한우생곱창, 대창구이, 곱창전골, 미나리육회",address:"울산광역시 중구 유곡로 62",tel:"0507-1401-4442",dist:1.2,zone:"유곡동",status:"warn",note:"최근 영업 흔적 없음(2026.8) — 확인 필요"},
+ {name:"BHC치킨 울산우정점",category:"치킨·주점",menu:"뿌링클, 골드킹, 커리퀸, 맛초킹",address:"울산광역시 중구 유곡로 44",tel:"052-244-1911",dist:1.25,zone:"유곡동"},
+ {name:"송갈비",category:"고기·구이",menu:"돼지생갈비, 수제돼지갈비, 삼겹살, 냉면",address:"울산광역시 중구 유곡로 31",tel:"052-953-7950",dist:1.3,zone:"유곡동"},
+ {name:"김밥나라 태화점",category:"분식·기타",menu:"김밥, 떡볶이, 만두, 라면",address:"울산광역시 중구 유곡로 27",tel:"052-700-4529",dist:1.3,zone:"유곡동"},
+ {name:"엄마잔치국수",category:"분식·기타",menu:"잔치국수, 비빔국수, 찐만두, 김밥",address:"울산광역시 중구 함월로 119 1층",tel:"0507-1341-4316",dist:1.8,zone:"성안·함월"},
+ {name:"언양돼지갈비",category:"고기·구이",menu:"양념돼지갈비, 삼겹살, 목살",address:"울산광역시 중구 함월6길 29-2 1층",tel:"052-246-9299",dist:1.9,zone:"성안·함월"},
+ {name:"뚝배기식당",category:"한식",menu:"두루치기, 다슬기탕, 제육, 콩나물국밥",address:"울산광역시 중구 태화로 237",tel:"052-245-3307",dist:2.0,zone:"태화동"},
+ {name:"연가네 추어칼제비",category:"분식·기타",menu:"추어칼제비, 얼큰손칼국수, 해물손칼국수, 왕만두",address:"울산광역시 중구 백양로 52",tel:"052-246-8877",dist:2.0,zone:"성안·함월"},
+ {name:"한우소고기국밥",category:"한식",menu:"한우소고기국밥",address:"울산광역시 중구 화진길 13-2 리버스위트상가 101-1호",tel:"052-244-2579",dist:2.2,zone:"태화동"},
+ {name:"백양민속포차",category:"치킨·주점",menu:"칼국수, 정구지전, 해물파전, 두부김치, 닭발",address:"울산광역시 중구 성안7길 20",tel:"052-244-0102",dist:2.2,zone:"성안·함월",status:"warn",note:"영업시간 확인 필요"},
+ {name:"청춘축산 인생숯불구이",category:"고기·구이",menu:"한우 육회, 육사시미, 등심, 한우비빔밥",address:"울산광역시 중구 성안7길 5",tel:"052-211-7761",dist:2.25,zone:"성안·함월"},
+ {name:"대밭골돼지국밥",category:"한식",menu:"돼지국밥, 순대국밥, 내장국밥, 섞어국밥",address:"울산광역시 중구 태화강국가정원길 229-2",tel:"052-223-0003",dist:2.3,zone:"태화동"},
+ {name:"먹골손칼국수",category:"분식·기타",menu:"손칼국수, 수제비, 얼큰칼국수, 들깨칼국수",address:"울산광역시 중구 화합로 509",tel:"052-281-6600",dist:2.3,zone:"성안·함월"},
+ {name:"국수나무 서동점",category:"분식·기타",menu:"칼국수, 돈까스, 오므라이스, 우동, 덮밥",address:"울산광역시 중구 종가로 651",tel:"052-903-9030",dist:2.4,zone:"서동"},
+ {name:"59참숯구이",category:"고기·구이",menu:"소갈비살소금구이, 늑간살양념구이, 생삼겹살",address:"울산광역시 중구 화합로 403 1층",tel:"0507-1349-3549",dist:2.5,zone:"성안·함월"},
+ {name:"변상은횟집",category:"한식",menu:"모듬회, 물회, 매운탕, 회덮밥",address:"울산광역시 중구 태화강국가정원길 1 1층",tel:"0507-1471-1492",dist:2.6,zone:"태화동"},
+ {name:"복산돈까스",category:"일식",menu:"흑돈안심돈까스, 일식돈까스, 치즈돈까스",address:"울산광역시 중구 손골2길 17-6 상가동 1층",tel:"052-298-4623",dist:2.7,zone:"복산동"},
+ {name:"이모네식당",category:"한식",menu:"낙지볶음정식, 갈치조림정식, 백반정식",address:"울산광역시 중구 새벽시장3길 10",tel:"052-298-4545",dist:2.8,zone:"복산동"},
+ {name:"자금성",category:"중식",menu:"탕수육, 짜장면, 짬뽕, 간짜장, 잡채밥",address:"울산광역시 중구 신기12길 38 동부아파트 상가 2층",tel:"052-244-9594",dist:2.9,zone:"복산동"},
+ {name:"소바루 서동점",category:"일식",menu:"하루소바, 궁중소바, 규카츠, 수제돈카츠",address:"울산광역시 중구 북부순환도로 880-1",tel:"0507-1338-7798",dist:3.0,zone:"서동"},
+ {name:"원조 참숯 뒷고기",category:"고기·구이",menu:"뒷고기, 삼겹살, 돼지갈비, 껍데기",address:"울산광역시 중구 서원2길 52 1층",tel:"0507-1392-5774",dist:3.1,zone:"복산동"},
+ {name:"영안반점",category:"중식",menu:"짬뽕, 짜장면, 간짜장, 볶음밥, 탕수육, 깐풍기",address:"울산광역시 중구 중앙길 13",tel:"052-211-3769",dist:3.3,zone:"학성·반구"},
+ {name:"태성산낙곱 국수",category:"한식",menu:"산낙곱전골, 산낙지볶음, 굴국밥, 콩국수",address:"울산광역시 중구 학성1길 44-3",tel:"052-297-9170",dist:3.4,zone:"학성·반구"},
+ {name:"박영춘 돼지국밥",category:"한식",menu:"돼지국밥, 소머리국밥, 순대국밥, 돼지수육",address:"울산광역시 중구 병영로 17",tel:"0507-1328-8895",dist:3.5,zone:"병영·남외"},
+ {name:"이가네한우소머리곰탕",category:"한식",menu:"소머리곰탕, 설렁탕, 꼬리곰탕, 수육",address:"울산광역시 중구 학산로 12",tel:"052-998-1002",dist:3.5,zone:"학성·반구"},
+ {name:"울산할매국밥",category:"한식",menu:"순대국밥, 병천순대, 모듬국밥, 소고기국밥",address:"울산광역시 중구 곽남길 18",tel:"052-285-2086",dist:3.6,zone:"병영·남외"},
+ {name:"돈대박 병영점",category:"고기·구이",menu:"대패삼겹살, 생삼겹살, 뒷고기, 된장찌개",address:"울산광역시 중구 곽남4길 21 1층",tel:"0507-1429-5514",dist:3.6,zone:"병영·남외"},
+ {name:"마마칼국수",category:"분식·기타",menu:"칼국수, 수제비, 짬뽕, 돌솥비빔밥, 순두부찌개",address:"울산광역시 중구 남외1길 56",tel:"052-291-1159",dist:3.8,zone:"병영·남외"},
+ {name:"제주생고기숯불구이 한판",category:"고기·구이",menu:"제주생오겹살, 항정살, 가브리살, 목살",address:"울산광역시 중구 반구정12길 5 1층",tel:"052-293-7033",dist:4.0,zone:"학성·반구"},
+ {name:"울산국수전문점",category:"분식·기타",menu:"부추해물손칼국수, 잔치국수, 비빔밥",address:"울산광역시 중구 반구정1안길 50",tel:"050-7715-6906",dist:4.0,zone:"학성·반구"},
+ {name:"마장동 고기집 반구2호점",category:"고기·구이",menu:"한돈세트, 양념돼지갈비세트, 우대갈비",address:"울산광역시 중구 반구로 11 1층",tel:"052-281-1090",dist:4.1,zone:"학성·반구"},
+ {name:"고인돌구들장삼겹살",category:"고기·구이",menu:"대패삼겹살, 생삼겹살, 냉면, 볶음밥",address:"울산광역시 중구 염포로 26 유로캐슬아파트 상가 104호",tel:"052-292-3320",dist:4.2,zone:"학성·반구"},
+ {name:"갈메기구이",category:"고기·구이",menu:"갈매기살, 한우차돌, 닭목살",address:"울산광역시 중구 번영로 540",tel:"052-282-9296",dist:4.3,zone:"학성·반구"},
+ /* ── 2026-08 웹 검색 검증으로 추가된 신규 식당 (좌표 미확정 → 거리는 추정치) ── */
+ {name:"정지용설렁탕",category:"한식",menu:"한우설렁탕, 한우곰탕, 도가니탕",address:"울산광역시 중구 종가6길 7 혁신더테라스 102호",tel:"052-245-2233",dist:1.0,zone:"혁신도시"},
+ {name:"시골동태탕",category:"한식",menu:"동태탕, 동태알탕",address:"울산광역시 중구 종가5길 75 1층",tel:"0507-1403-6262",dist:1.2,zone:"혁신도시"},
+ {name:"청한옥",category:"한식",menu:"물냉면, 회냉면, 갈비탕",address:"울산광역시 중구 종가5길 69-1 1층",tel:"0507-1319-3011",dist:1.2,zone:"혁신도시"},
+ {name:"밀돈육",category:"한식",menu:"비빔밀면, 돈까스, 백반",address:"울산광역시 중구 성안로 139",tel:"0508-9595-4204",dist:0.9,zone:"성안·함월"},
+ {name:"따손밥집",category:"한식",menu:"가정식백반",address:"울산광역시 중구 종가로 406-21",tel:"052-245-3341",dist:0.1,zone:"정문권"},
+ {name:"혜화곰탕설렁탕",category:"한식",menu:"한우곰탕, 설렁탕, 냉면",address:"울산광역시 중구 종가2길 39",tel:"",dist:1.6,zone:"혁신도시"},
+ {name:"덕수파스타 우정혁신점",category:"양식",menu:"땡초크림파스타, 머쉬룸크림파스타",address:"울산광역시 중구 종가5길 73 1층",tel:"0507-1370-2961",dist:1.2,zone:"혁신도시"},
+ {name:"월남면반 우정혁신점",category:"분식·기타",menu:"쌀국수, 분짜, 반쎄오",address:"울산광역시 중구 종가5길 81-6",tel:"052-212-0977",dist:1.3,zone:"혁신도시"},
+ {name:"하하보리밥",category:"한식",menu:"보리밥정식, 갈치구이, 청국장",address:"울산광역시 중구 함월22길 8",tel:"0508-9301-8989",dist:1.5,zone:"성안·함월"},
+ {name:"함평냉면",category:"한식",menu:"냉면, 다슬기탕",address:"울산광역시 중구 서원1길 62 1층",tel:"052-296-5342",dist:1.6,zone:"복산동"},
+ {name:"옥이네김치찌개와직화삼겹 중구점",category:"한식",menu:"김치찌개, 직화삼겹, 고추장불고기",address:"울산광역시 중구 도화골1길 12",tel:"052-291-3363",dist:1.7,zone:"복산동"},
+ {name:"엠제트세대떡볶이치킨 울산유곡점",category:"분식·기타",menu:"로제떡볶이, 모둠튀김, 떡볶이치킨세트",address:"울산광역시 중구 종가4길 5 1층 105호",tel:"0507-1462-2306",dist:1.3,zone:"유곡동"},
+ {name:"카페 기와",category:"카페·디저트",menu:"브런치, 냉파스타, 샐러드",address:"울산광역시 중구 성동1길 74-5",tel:"052-246-2212",dist:1.5,zone:"성안·함월"},
+ {name:"더돈까스175",category:"일식",menu:"돈까스, 크림돈까스, 치즈돈까스",address:"울산광역시 중구 태화강국가정원길 231-12",tel:"0507-1452-1758",dist:2.5,zone:"태화동"},
+ {name:"양봉천칼국수",category:"한식",menu:"메밀면샤브칼국수, 만두전골샤브칼국수, 해물파전",address:"울산광역시 중구 태화강국가정원길 231-8",tel:"0504-0666-7083",dist:2.5,zone:"태화동"}
+];
+
+/* =========================================================================
+   2. 상태
+   ========================================================================= */
+let DATA = [];                    // SEED + 공유 큐레이션(추가·삭제·상태) 반영본
+let REVIEWS = [];                 // {id,dev,target,targetName,exp,cmp,rec,taste,price,speed,stars,comment,who,at}
+let CURATION = { removed:{}, status:{}, added:[] };   // 목록 수정본 — Firestore meta/overrides 로 모두에게 공유
+let MY = { exp:null, nick:'' };   // exp: true(경험있음) / false(없음) / null(미응답)
+let filterCat = '전체';
+let lastUpdate = null;
+let fbState = 'off';              // off | connecting | ok | cache | local | err
+const expandedCmt = {};
+
+/* ── 기기 로컬 저장(localStorage): 프로필·기기ID·로컬모드 평가 ──────────
+   예전 버전은 새로고침하면 모든 상태가 사라졌다. 이제 닉네임·경험 여부·
+   지도 선택이 기기에 남고, Firebase 미설정 시에도 평가가 보존된다. */
+const LS = {
+  get(k,d){ try{ const v=localStorage.getItem('rf_'+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('rf_'+k, JSON.stringify(v)); }catch(e){} }
+};
+const DEV = (()=>{                 // 기기 식별자 — '식당 1곳당 1기기 1평가(재평가=수정)'의 기준
+  let d = LS.get('dev');
+  if(!d){ d = 'd'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); LS.set('dev', d); }
+  return d;
+})();
+MY.exp  = LS.get('exp',  null);
+MY.nick = LS.get('nick', '');
+{ const m = LS.get('map', null); if(m) MAP_PROVIDER = m; }
+function saveProfile(){ LS.set('exp', MY.exp); LS.set('nick', MY.nick); LS.set('map', MAP_PROVIDER); }
+
+/* SEED + 공유 큐레이션 → 화면에 쓰는 DATA 를 다시 만든다 */
+function rebuildData(){
+  const base  = SEED.map((r,i)=>({ id:'r'+i, status:r.status||'ok', note:r.note||'', ...r }));
+  const added = (CURATION.added||[]).map(a=>({ status:'new', note:'', ...a }));
+  DATA = base.concat(added)
+    .filter(r => !(CURATION.removed||{})[r.id])
+    .map(r => (CURATION.status||{})[r.id] ? {...r, ...CURATION.status[r.id]} : r);
+  if(CURATION.updatedAt) lastUpdate = new Date(CURATION.updatedAt);
+}
+rebuildData();
+
+/* =========================================================================
+   3. 유틸
+   ========================================================================= */
+const $  = s=>document.querySelector(s);
+const $$ = s=>[...document.querySelectorAll(s)];
+const enc = encodeURIComponent;
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function shortAddr(a){ return a ? a.replace('울산광역시 ','').split(' ').slice(0,3).join(' ') : ''; }
+
+
+/* 도착지 – 음식점 주소를 우선 사용한다(주소가 지도상 한 지점으로 정확히 잡힘).
+   주소가 비어 있을 때만 상호명으로 대체한다. */
+function destQuery(r){
+  const a = String(r.address||'').trim();
+  if(a) return a;
+  const n = String(r.name||'').trim();
+  return /울산/.test(n) ? n : `${n} 울산 중구`;
+}
+
+/* 카카오·네이버 모두 길찾기 URL 규격이 좌표를 요구하므로, 주소 문자열로는
+   도착지까지만 지정할 수 있다. 출발지는 버튼을 누를 때 클립보드로 복사한다. */
+function kakaoRoute(r){ return `https://map.kakao.com/link/search/${enc(destQuery(r))}`; }
+function naverRoute(r){ return `https://map.naver.com/p/search/${enc(destQuery(r))}`; }
+
+/* 사용자가 설정에서 고른 지도 서비스로 길찾기 링크를 만든다 */
+const PROVIDERS = {
+  kakao:{ label:'카카오맵', url:kakaoRoute },
+  naver:{ label:'네이버지도', url:naverRoute }
+};
+function routeUrl(r){ return (PROVIDERS[MAP_PROVIDER]||PROVIDERS.kakao).url(r); }
+
+/* =========================================================================
+   모바일: 설치된 지도앱을 직접 실행
+   - 카카오맵 / 네이버지도 앱 URL 스킴을 차례로 시도한다
+   - 앱이 열리면 브라우저가 백그라운드로 내려가므로 visibilitychange 로 감지
+   - 둘 다 반응이 없으면 미설치로 보고 안내한다
+   ========================================================================= */
+const IS_MOBILE = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+               || (matchMedia('(pointer:coarse)').matches && innerWidth <= 900);
+const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+/* 카카오톡·네이버·인스타 등 '인앱 브라우저'는 tel: 을 열 때마다
+   "앱 전환을 허용하시겠습니까?" 확인창을 띄운다. 이 경우 전화 걸기 대신
+   번호를 복사해 주는 편이 낫다. */
+const IS_INAPP = /KAKAOTALK|NAVER\(inapp|DaumApps|Instagram|FBAN|FBAV|FB_IAB|Line\/|everytimeApp|wadiz|AliApp|zumapp|kakaostory/i
+  .test(navigator.userAgent);
+
+function copyText(text, msg){
+  const ok = legacyCopy(text);
+  if(!ok && navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).catch(()=>{});
+  toast(msg);
+}
+
+function kakaoAppUrl(r){
+  if(hasCoord(ORIGIN) && hasCoord(r))
+    return `kakaomap://route?sp=${ORIGIN.lat},${ORIGIN.lng}&ep=${r.lat},${r.lng}&by=FOOT`;
+  return `kakaomap://search?q=${enc(destQuery(r))}`;
+}
+function naverAppUrl(r){
+  const app = enc('교육원주변식당');
+  if(hasCoord(ORIGIN) && hasCoord(r))
+    return `nmap://route/walk?slat=${ORIGIN.lat}&slng=${ORIGIN.lng}&sname=${enc(ORIGIN.name)}`
+         + `&dlat=${r.lat}&dlng=${r.lng}&dname=${enc(r.name)}&appname=${app}`;
+  return `nmap://search?query=${enc(destQuery(r))}&appname=${app}`;
+}
+function hasCoord(o){ return o && o.lat!=null && o.lng!=null; }
+
+/* 스킴을 한 번 시도하고, 앱 전환이 일어났는지 판정 */
+function trySchemeOnce(url, waitMs){
+  return new Promise(resolve=>{
+    let switched = false;
+    const mark = ()=>{ if(document.hidden) switched = true; };
+    document.addEventListener('visibilitychange', mark);
+    window.addEventListener('pagehide', mark);
+    window.addEventListener('blur', mark);
+
+    if(IS_IOS){
+      location.href = url;                     // iOS는 iframe 방식이 막혀 있다
+    }else{
+      const f = document.createElement('iframe');
+      f.style.cssText = 'display:none';
+      f.src = url;
+      document.body.appendChild(f);
+      setTimeout(()=>f.remove(), waitMs + 200);
+    }
+    setTimeout(()=>{
+      document.removeEventListener('visibilitychange', mark);
+      window.removeEventListener('pagehide', mark);
+      window.removeEventListener('blur', mark);
+      resolve(switched || document.hidden);
+    }, waitMs);
+  });
+}
+
+/* 사용자가 고른 지도를 먼저, 실패하면 다른 지도를 시도 */
+async function openMapApp(r){
+  const order = MAP_PROVIDER === 'naver'
+    ? [['네이버지도', naverAppUrl(r)], ['카카오맵', kakaoAppUrl(r)]]
+    : [['카카오맵', kakaoAppUrl(r)], ['네이버지도', naverAppUrl(r)]];
+
+  for(const [label, url] of order){
+    const ok = await trySchemeOnce(url, 1200);
+    if(ok) return label;
+  }
+  return null;
+}
+function providerLabel(){ return (PROVIDERS[MAP_PROVIDER]||PROVIDERS.kakao).label; }
+/* 받침이 있으면 '으로', 없거나 ㄹ이면 '로' (카카오맵으로 / 네이버지도로) */
+function ro(word){
+  const c = word.charCodeAt(word.length-1) - 0xAC00;
+  if(c < 0 || c > 11171) return word + '로';
+  const jong = c % 28;
+  return word + (jong === 0 || jong === 8 ? '로' : '으로');
+}
+
+/* 출발지 주소를 클립보드에 복사 – 어떤 지도앱에서도 붙여넣기 한 번으로 입력 */
+/* 출발지 주소 복사.
+   - navigator.clipboard 는 HTTPS(보안 컨텍스트)에서만 동작한다.
+   - iOS Safari 는 숨긴 textarea 의 select() 를 무시하므로
+     readOnly + setSelectionRange 조합을 써야 복사가 걸린다.
+   - 링크 이동과 경쟁하지 않도록 동기 경로를 먼저 시도한다. */
+function legacyCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.readOnly = true;                                  // iOS 키보드가 올라오지 않게
+  ta.contentEditable = 'true';
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';
+  document.body.appendChild(ta);
+  const range = document.createRange();
+  range.selectNodeContents(ta);
+  const sel = window.getSelection();
+  sel.removeAllRanges(); sel.addRange(range);
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+  sel.removeAllRanges();
+  ta.remove();
+  return ok;
+}
+
+function copyOrigin(){
+  const text = ORIGIN.addr;
+  let ok = legacyCopy(text);                            // 사용자 제스처 안에서 즉시 실행
+  if(!ok && navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).catch(()=>{});
+    ok = true;
+  }
+  toast(ok ? `출발지 “${text}” 복사됨 · 출발지 칸에 붙여넣기`
+           : `출발지: ${text} (길게 눌러 복사해 주세요)`);
+  return ok;
+}
+
+let toastT=null;
+
+function toast(msg){
+  let el=$('#toast');
+  if(!el){ el=document.createElement('div'); el.id='toast'; document.body.appendChild(el); }
+  const fab=$('.fab');                                  /* 하단 고정바 높이만큼 띄운다 */
+  if(fab) el.style.bottom = (fab.getBoundingClientRect().height + 12) + 'px';
+  el.textContent=msg; el.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'), 2600);
+}
+
+
+function webSearch(r){ return `https://search.naver.com/search.naver?query=${enc(r.name+' '+shortAddr(r.address))}`; }
+function uid(){ return 'v'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+
+/* 거리 표기 – 이동수단은 항상 도보 기준 */
+/* 좌표로 검증된 거리만 실측값으로 표기하고, 검증 안 된 항목은 추정임을 밝힌다 */
+function distLabel(d, geo){
+  if(d==null) return '거리 미확인';
+  const t = d<0.1 ? `${Math.round(d*1000)}m` : `${d.toFixed(d<1?2:1)}km`;
+  const min = Math.max(1, Math.round(d*WALK_MIN_PER_KM));
+  return geo ? `${t} · 도보 ${min}분` : `약 ${t} · 도보 ${min}분 (추정)`;
+}
+/* 점심시간(약 60분) 도보 왕복 가능성 */
+function lunchTag(d){
+  if(d<=0.8) return {t:'도보 왕복 여유', c:'ok'};
+  if(d<=1.5) return {t:'도보 왕복 빠듯', c:'warn'};
+  if(d<=2.5) return {t:'도보 왕복 어려움', c:'warn'};
+  return {t:'도보로는 무리', c:'bad'};
+}
+
+/* =========================================================================
+   4. 평가 집계
+   ========================================================================= */
+/* REVIEWS를 target별로 한 번만 색인해 두고, agg 결과를 캐시한다.
+   기존에는 식당 1곳당 REVIEWS 전체를 훑었고(O(식당수 × 평가수)),
+   '평가 순' 정렬에서는 비교마다 다시 계산돼 렌더가 급격히 느려졌다. */
+let _revIndex = null, _aggCache = null;
+function invalidateReviews(){ _revIndex = null; _aggCache = null; }
+function revIndex(){
+  if(_revIndex) return _revIndex;
+  const m = new Map();
+  for(const v of REVIEWS){
+    const k = v.target;
+    const arr = m.get(k);
+    if(arr) arr.push(v); else m.set(k, [v]);
+  }
+  return (_revIndex = m);
+}
+function hasReview(id){ return revIndex().has(id); }
+
+/* =========================================================================
+   거리별 노출 정책
+   - 2km 이내  : 전수(100%) — 목록에서 절대 빠지지 않는다
+   - 2~5km     : 50% 표본
+   - 5km 초과  : 10% 표본
+   평가가 하나라도 달린 곳은 거리와 무관하게 항상 노출된다.
+   ========================================================================= */
+const COVERAGE = [
+  {max:2,        rate:1.00, label:'2km 이내 전수'},
+  {max:5,        rate:0.50, label:'2–5km 50% 표본'},
+  {max:Infinity, rate:0.10, label:'5km 초과 10% 표본'}
+];
+let sampleSeed = 1;                 // '다시 섞기'로만 바뀐다 → 렌더마다 목록이 흔들리지 않음
+let showAllTiers = false;           // 표본을 무시하고 전체 보기
+
+function coverageOf(d){
+  const v = (d==null) ? 0 : d;      // 거리 미확인은 가장 보수적으로 전수 취급
+  return COVERAGE.find(c=>v<=c.max);
+}
+/* id+seed 해시 → 0~1 난수. 같은 seed면 항상 같은 결과 */
+function stableRand(id, seed){
+  let h = 2166136261 ^ seed;
+  const str = String(id);
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return ((h >>> 0) % 100000) / 100000;
+}
+function inSample(r){
+  if(showAllTiers) return true;
+  if(hasReview(r.id)) return true;                 // 평가된 곳은 우선 노출
+  const c = coverageOf(r.dist);
+  if(c.rate >= 1) return true;
+  return stableRand(r.id, sampleSeed) < c.rate;
+}
+
+function agg(targetId){
+  if(!_aggCache) _aggCache = new Map();
+  const cached = _aggCache.get(targetId);
+  if(cached) return cached;
+  const out = _agg(targetId);
+  _aggCache.set(targetId, out);
+  return out;
+}
+
+function _agg(targetId){
+  const rs = revIndex().get(targetId) || [];
+  const out = { n:rs.length, nCmp:0, nRec:0, cmpAvg:null, recAvg:null, score:null,
+                taste:null, price:null, speed:null, stars:null, comments:[] };
+  if(!rs.length) return out;
+  let cs=0, rsum=0, sc=0, scn=0;
+  const acc={taste:[],price:[],speed:[],stars:[]};
+  rs.forEach(v=>{
+    if(typeof v.cmp==='number'){ out.nCmp++; cs+=v.cmp; sc+=v.cmp; scn++; }
+    else if(typeof v.rec==='number'){ out.nRec++; rsum+=v.rec; sc+=(REC2CMP[v.rec]||0); scn++; }
+    ['taste','price','speed','stars'].forEach(k=>{ if(typeof v[k]==='number'&&v[k]>0) acc[k].push(v[k]); });
+    if(v.comment) out.comments.push(v);
+  });
+  if(out.nCmp) out.cmpAvg = cs/out.nCmp;
+  if(out.nRec) out.recAvg = rsum/out.nRec;
+  if(scn) out.score = sc/scn;
+  ['taste','price','speed','stars'].forEach(k=>{
+    if(acc[k].length) out[k] = acc[k].reduce((a,b)=>a+b,0)/acc[k].length;
+  });
+  out.comments.sort((a,b)=> (b.at||'').localeCompare(a.at||''));
+  return out;
+}
+function verdict(a){
+  if(!a.n || a.score===null) return {cls:'none', t:'평가 없음'};
+  if(a.score >=  1.0) return {cls:'go',    t:'나갈 만함'};
+  if(a.score >=  0.3) return {cls:'maybe', t:'가볼 만함'};
+  if(a.score >= -0.3) return {cls:'same',  t:'구내식당과 비슷'};
+  return {cls:'stay', t:'구내식당 권장'};
+}
+function signed(x){ return (x>0?'+':'') + x.toFixed(1); }
+function starStr(v){ const f=Math.round(v); return '★★★★★'.slice(0,f)+'☆☆☆☆☆'.slice(0,5-f); }
+
+/* =========================================================================
+   5. 렌더 – 구내식당 기준 카드
+   ========================================================================= */
+function renderBase(){
+  const a = agg('canteen');
+  const st = a.stars!=null ? a.stars : null;
+  const dot = (fbState==='ok'||fbState==='cache') ? '<span class="dot on"></span>' : '';
+  $('#baseCard').innerHTML = `
+    <div class="base-top">
+      <div style="flex:1;min-width:180px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="base-t">🏫 ${CANTEEN.name}</span>
+          <span class="base-tag">비교 기준</span>
+        </div>
+        <div class="base-desc">${CANTEEN.desc}</div>
+      </div>
+      <button class="btn sm" data-rate="canteen">⭐ 구내식당 평가하기</button>
+    </div>
+    <div class="base-body">
+      ${st!=null ? `
+        <div class="bigstar">
+          <span class="v">${st.toFixed(1)}</span>
+          <span class="s">${starStr(st)}</span>
+          <span class="c">· ${a.n}명</span>
+        </div>` : `<div class="bigstar"><span class="c">아직 평가가 없습니다. 첫 평가를 남겨주세요.</span></div>`}
+      ${st!=null ? `<div class="metrics">
+        ${ASPECTS.map(x=>a[x.k]!=null?`<span>${x.t} <b>${a[x.k].toFixed(1)}</b></span>`:'').join('')}
+      </div>` : ''}
+      ${dot?`<div class="metrics" style="margin-left:auto">${dot}실시간 공유 중</div>`:''}
+    </div>
+    ${a.comments.length?`<div class="cmt" style="margin-top:10px">“${esc(a.comments[0].comment)}” <span class="who">— ${esc(a.comments[0].who||'익명')}</span></div>`:''}
+  `;
+  $('#baseCard').querySelector('[data-rate]').onclick = ()=>openRate('canteen');
+}
+
+/* =========================================================================
+   6. 렌더 – 목록
+   ========================================================================= */
+function buildChips(){
+  const box = $('#chips');
+  const counts = new Map();                         /* 업종별 개수를 한 번에 집계 */
+  for(const r of DATA) counts.set(r.category, (counts.get(r.category)||0)+1);
+  box.innerHTML = ['전체', ...CATS].map(c=>{
+    const n = c==='전체' ? DATA.length : (counts.get(c)||0);
+    return `<button class="chip" data-cat="${c}" aria-pressed="${c===filterCat}">${c}<span class="n">${n}</span></button>`;
+  }).join('');
+  box.onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; filterCat=b.dataset.cat; buildChips(); render(); };
+}
+
+function visible(){
+  const q = $('#q').value.trim().toLowerCase();
+  const rad = parseFloat($('#radius').value);
+  const hide = $('#hideClosed').checked;
+  const onlyRated = $('#onlyRated').checked;
+  let rows = DATA.filter(r=>{
+    if(filterCat!=='전체' && r.category!==filterCat) return false;
+    if((r.dist||0) > rad) return false;
+    if(hide && r.status==='bad') return false;
+    if(onlyRated && !hasReview(r.id)) return false;
+    if(!inSample(r)) return false;
+    if(q){
+      const hay = (r.name+' '+r.menu+' '+r.address+' '+r.category+' '+(r.zone||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  /* 기본은 상호명순, '거리순 정렬'을 켜면 가까운 순 */
+  const byDist = $('#sortDist').checked;
+  rows.sort((a,b)=>{
+    if(byDist){
+      const d = (a.dist ?? 99) - (b.dist ?? 99);
+      if(d !== 0) return d;
+    }
+    return a.name.localeCompare(b.name,'ko');
+  });
+  return rows;
+}
+
+const STATUS_TXT = {ok:'운영 중', warn:'확인 필요', bad:'폐업 확인', new:'직접 추가'};
+
+function card(r){
+  const a = agg(r.id), v = verdict(a), lt = lunchTag(r.dist||0);
+  const few = a.n>0 && a.n<3;
+  let vmeta;
+  if(!a.n) vmeta = `<span class="vmeta dim">아직 응답이 없습니다 · 첫 평가를 남겨주세요</span>`;
+  else{
+    const bits=[];
+    if(a.nCmp) bits.push(`교육원 대비 <b>${signed(a.cmpAvg)}</b>`);
+    if(a.nRec) bits.push(`추천 <b>${a.recAvg.toFixed(1)}</b>/4`);
+    vmeta = `<span class="vmeta">${bits.join(' · ')} <span class="dim">· ${a.n}명${few?' · 표본 적음':''}</span></span>`;
+  }
+  const sc = ASPECTS.filter(x=>a[x.k]!=null).map(x=>`<span>${x.t} <b>${a[x.k].toFixed(1)}</b></span>`).join('');
+  const open = expandedCmt[r.id];
+  return `
+  <article class="card ${r.status==='bad'?'closed':''}">
+    <div class="c-top">
+      <div class="c-name">${esc(r.name)}</div>
+      <span class="cat" data-c="${esc(r.category)}">${esc(r.category)}</span>
+      <button class="mini rate rate-top" data-rate="${r.id}">${myReviewOf(r.id)?'✏️ 내 평가':'⭐ 평가'}</button>
+    </div>
+    ${r.menu?`<div class="c-menu">${esc(r.menu)}</div>`:''}
+
+    <div class="verdict">
+      <span class="vb ${v.cls}">${v.t}</span>
+      ${vmeta}
+    </div>
+    ${sc?`<div class="scores">${sc}</div>`:''}
+    ${a.comments.length?`
+      <div class="cmt">“${esc(a.comments[0].comment)}” <span class="who">— ${esc(a.comments[0].who||'익명')}</span></div>
+      ${a.comments.length>1?`<button class="lnk" data-cmt="${r.id}">${open?'후기 접기':'후기 '+a.comments.length+'개 모두 보기'}</button>`:''}
+      ${open?a.comments.slice(1).map(c=>`<div class="cmt">“${esc(c.comment)}” <span class="who">— ${esc(c.who||'익명')}</span></div>`).join(''):''}
+    `:''}
+
+    <div class="c-meta">
+      <span class="status ${r.status}">${STATUS_TXT[r.status]||''}</span>
+      <span>📏 <b>${distLabel(r.dist, r.geo)}</b></span>${r.geo?'':'<span class="dim" title="좌표 미검증 – 실제 거리와 다를 수 있습니다">⚠</span>'}
+      <span class="status ${lt.c}">⏱ ${lt.t}</span>
+    </div>
+    <div class="c-meta addr-row">
+      <span class="addr">${r.address?`📍 ${esc(r.address)}`:''}</span>
+      ${r.zone?`<span class="admin-only">· ${esc(r.zone)}</span>`:''}
+      ${r.tel?`<a class="mini tel-inline" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
+         data-tel="${esc(r.tel)}" title="${esc(r.tel)}"><span class="ico">📞</span><span class="tel-num">${esc(r.tel)}</span></a>`:''}
+    </div>
+    ${r.note?`<div class="c-meta"><span style="color:var(--warn)">⚠ ${esc(r.note)}</span></div>`:''}
+
+    <div class="c-act admin-only">
+      ${r.tel?`<a class="mini" href="tel:${r.tel.replace(/[^0-9]/g,'')}"
+         data-tel="${esc(r.tel)}" title="전화 앱이 열립니다">📞 ${esc(r.tel)}</a>`:'<span class="mini dim" style="cursor:default">번호 없음</span>'}
+      <a class="mini go" href="${routeUrl(r)}" target="_blank" rel="noopener"
+         data-route="${r.id}"
+         title="${providerLabel()}에서 이 주소로 열기 · 출발지 주소는 클립보드에 복사됩니다">🚶 길찾기</a>
+      <button class="mini" data-del="${r.id}" title="목록에서 삭제">🗑</button>
+    </div>
+  </article>`;
+}
+
+function render(){
+  const rows = visible();
+  const box = $('#list');
+  if(!rows.length){
+    box.innerHTML = `<div class="empty">조건에 맞는 식당이 없습니다.<br>업종 필터나 거리 범위를 넓혀 보세요.</div>`;
+  } else {
+    box.innerHTML = `<div class="grid">${rows.map(card).join('')}</div>`;
+  }
+  const near = DATA.filter(r=>(r.dist||0)<=2).length;
+  const hidden = DATA.length - rows.length;
+  $('#count').innerHTML =
+    `${rows.length}곳 표시 / 전체 ${DATA.length}곳 · <b>2km 이내 ${near}곳 전수</b>`
+    + (showAllTiers ? '' : ` · 표본 제외 ${hidden}곳`);
+  renderBase(); stamp();
+}
+
+/* 목록 클릭은 위임 방식으로 딱 한 번만 연결한다(기존에는 렌더마다 재바인딩) */
+$('#list').addEventListener('click', e=>{
+  const tel = e.target.closest('[data-tel]');
+  if(tel && IS_INAPP){                            // 인앱 브라우저: 확인창 대신 번호 복사
+    e.preventDefault();
+    copyText(tel.dataset.tel, `전화번호 ${tel.dataset.tel} 복사됨 · 전화 앱에 붙여넣기`);
+    return;
+  }
+
+  const go = e.target.closest('[data-route]');
+  if(go){
+    if(!IS_MOBILE){ copyOrigin(); return; }       // 데스크톱: 기존대로 웹 지도 열기
+    e.preventDefault();                            // 모바일: 설치된 지도앱 실행
+    const r = DATA.find(x=>x.id===go.dataset.route);
+    if(!r) return;
+    go.classList.add('busy');
+    openMapApp(r).then(opened=>{
+      go.classList.remove('busy');
+      if(!opened) toast('지도앱이 설치되어 있지 않습니다.');
+    });
+    return;
+  }
+  const rt = e.target.closest('[data-rate]');
+  if(rt){ openRate(rt.dataset.rate); return; }
+  const ct = e.target.closest('[data-cmt]');
+  if(ct){ expandedCmt[ct.dataset.cmt] = !expandedCmt[ct.dataset.cmt]; render(); return; }
+  const del = e.target.closest('[data-del]');
+  if(del){
+    const r = DATA.find(x=>x.id===del.dataset.del);
+    if(r && confirm(`'${r.name}' 을(를) 목록에서 삭제할까요?\n(모든 사용자에게 반영됩니다)`)){
+      CURATION.removed[r.id]=true; pushCuration(); rebuildData(); buildChips(); render();
+    }
+  }
+});
+
+function fbStatText(){
+  return fbState==='ok'         ? '<span class="dot on"></span>실시간 공유 중'
+       : fbState==='cache'      ? '<span class="dot on"></span>오프라인 · 캐시 표시 중'
+       : fbState==='connecting' ? '<span class="dot"></span>서버 연결 중…'
+       : fbState==='local'      ? '<span class="dot"></span>기기 저장 모드'
+       : fbState==='err'        ? '<span class="dot"></span>서버 연결 오류'
+       :                          '<span class="dot"></span>준비 중';
+}
+function stamp(){
+  const t = lastUpdate ? lastUpdate.toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '없음';
+  $('#stamp').innerHTML = `${fbStatText()} · 목록 <b>${DATA.length}</b>곳 · 평가 <b>${REVIEWS.length}</b>건 · 목록 최신화 ${t}`;
+}
+
+/* =========================================================================
+   7. 평가(설문) 모달
+   ========================================================================= */
+let draft = null;
+
+function openRate(targetId){
+  const isCanteen = targetId==='canteen';
+  const t = isCanteen ? CANTEEN : DATA.find(r=>r.id===targetId);
+  if(!t) return;
+  const prev = myReviewOf(targetId);           /* 이미 평가한 곳이면 수정 모드로 */
+  draft = prev
+    ? { target:targetId, targetName:t.name, cmp:prev.cmp, rec:prev.rec,
+        taste:prev.taste||0, price:prev.price||0, speed:prev.speed||0, stars:prev.stars||0,
+        comment:prev.comment||'' }
+    : { target:targetId, targetName:t.name, cmp:null, rec:null, taste:0, price:0, speed:0, stars:0, comment:'' };
+  drawRate();
+  $('#mRate').classList.add('on');
+}
+
+function drawRate(){
+  const isCanteen = draft.target==='canteen';
+  const t = isCanteen ? CANTEEN : DATA.find(r=>r.id===draft.target);
+  const P = $('#ratePanel');
+
+  /* STEP 0 — 구내식당 경험 여부를 아직 안 물었으면 먼저 묻는다 */
+  if(MY.exp===null){
+    P.innerHTML = `
+      <h2>먼저 한 가지만 여쭙니다</h2>
+      <p class="lead">교육원 구내식당을 기준으로 비교해 드리기 위해 필요합니다. 한 번만 답하면 됩니다.</p>
+      <div class="q">
+        <h3>교육원 구내식당에서 식사해 보셨나요?</h3>
+        <p class="qs">있다면 <b>구내식당과 비교</b>해서, 없다면 <b>다른 교육생에게 추천할지</b>로 여쭤봅니다.</p>
+        <div class="opts g2">
+          <button class="opt" data-exp="1"><span class="e">🍚</span>네, 먹어봤습니다</button>
+          <button class="opt" data-exp="0"><span class="e">🙅</span>아니요, 없습니다</button>
+        </div>
+      </div>
+      <div class="panel-act"><button class="btn" data-close style="flex:1">나중에</button></div>`;
+    P.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{
+      MY.exp = b.dataset.exp==='1';
+      syncExpToggle();
+      drawRate();
+    });
+    return;
+  }
+
+  /* 구내식당 자체 평가인데 경험이 없다고 답한 경우 */
+  if(isCanteen && MY.exp===false){
+    P.innerHTML = `
+      <h2>${CANTEEN.name}</h2>
+      <p class="lead">구내식당 이용 경험이 없다고 답하셨습니다. 한 번 이용해 보신 뒤 평가해 주세요.</p>
+      <div class="note info">경험이 생기셨다면 아래 버튼으로 바꿀 수 있습니다.</div>
+      <div class="panel-act">
+        <button class="btn" id="flipExp">이용해 봤습니다로 변경</button>
+        <button class="btn primary" data-close>닫기</button>
+      </div>`;
+    P.querySelector('#flipExp').onclick = ()=>{ MY.exp=true; syncExpToggle(); drawRate(); };
+    return;
+  }
+
+  const q1 = isCanteen ? `
+    <div class="q">
+      <h3>구내식당, 몇 점을 주시겠어요?</h3>
+      <p class="qs">이 점수가 주변 식당 비교의 기준선이 됩니다.</p>
+      <div class="starrow">
+        <span class="lb">전체 만족도</span>
+        <span class="stars" data-star="stars"></span>
+        <span class="val" data-val="stars"></span>
+      </div>
+    </div>`
+  : (MY.exp ? `
+    <div class="q">
+      <h3>교육원 구내식당과 비교하면 어떠셨나요?</h3>
+      <p class="qs">교육원을 벗어나 여기까지 갈 값어치가 있었는지를 기준으로 골라주세요.</p>
+      <div class="opts g5" data-grp="cmp">
+        ${CMP_OPTS.map(o=>`<button class="opt" data-tone="${o.tone}" data-v="${o.v}" aria-pressed="${draft.cmp===o.v}"><span class="e">${o.e}</span>${o.t}</button>`).join('')}
+      </div>
+    </div>`
+  : `
+    <div class="q">
+      <h3>다른 교육생에게 추천하시겠어요?</h3>
+      <p class="qs">구내식당 이용 경험이 없다고 하셔서, 추천 여부로 여쭙습니다.</p>
+      <div class="opts g4" data-grp="rec">
+        ${REC_OPTS.map(o=>`<button class="opt" data-tone="${o.tone}" data-v="${o.v}" aria-pressed="${draft.rec===o.v}"><span class="e">${o.e}</span>${o.t}</button>`).join('')}
+      </div>
+    </div>`);
+
+  P.innerHTML = `
+    <h2>${esc(t.name)} 평가</h2>
+    <p class="lead">${isCanteen ? '교육원 구내식당' : `기준점에서 ${distLabel(t.dist)} · ${esc(t.category)}`}</p>
+    ${q1}
+    <div class="q">
+      <h3>항목별 점수 <span style="font-weight:500;color:var(--ink3);font-size:12px">(선택)</span></h3>
+      <p class="qs">건너뛰어도 등록됩니다.</p>
+      ${ASPECTS.map(x=>`
+        <div class="starrow">
+          <span class="lb">${x.t}<small>${x.s}</small></span>
+          <span class="stars" data-star="${x.k}"></span>
+          <span class="val" data-val="${x.k}"></span>
+        </div>`).join('')}
+    </div>
+    <div class="field">
+      <label for="cmt">한줄평 <span style="font-weight:500;color:var(--ink3)">(선택)</span></label>
+      <textarea id="cmt" rows="2" placeholder="예: 12시 정각에 가면 10분 대기. 뛰어갔다 오면 딱 맞음">${esc(draft.comment||'')}</textarea>
+    </div>
+    <div class="field">
+      <label for="who">표시 이름 <span style="font-weight:500;color:var(--ink3)">(선택)</span></label>
+      <input type="text" id="who" placeholder="익명" value="${esc(MY.nick)}">
+    </div>
+    <div class="log" id="rateLog" hidden></div>
+    <div class="panel-act">
+      <button class="btn" data-close>취소</button>
+      <button class="btn primary" id="btnRateSave">${myReviewOf(draft.target)?'수정 저장':'평가 등록'}</button>
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      <button class="lnk" id="flipExp2">${MY.exp?'구내식당 이용 경험 없음으로 변경':'구내식당 이용 경험 있음으로 변경'}</button>
+    </div>`;
+
+  /* 선택지 */
+  P.querySelectorAll('[data-grp]').forEach(g=>{
+    g.onclick = e=>{
+      const b = e.target.closest('.opt'); if(!b) return;
+      g.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed', x===b));
+      draft[g.dataset.grp] = parseInt(b.dataset.v,10);
+    };
+  });
+  /* 별점 */
+  P.querySelectorAll('[data-star]').forEach(sp=>{
+    const k = sp.dataset.star;
+    const paint = ()=>{
+      sp.innerHTML = [1,2,3,4,5].map(i=>`<button class="${draft[k]>=i?'on':''}" data-i="${i}" aria-label="${i}점">★</button>`).join('');
+      const v = P.querySelector(`[data-val="${k}"]`); if(v) v.textContent = draft[k]?draft[k]+'.0':'';
+    };
+    sp.onclick = e=>{
+      const b = e.target.closest('button'); if(!b) return;
+      const i = parseInt(b.dataset.i,10);
+      draft[k] = (draft[k]===i) ? 0 : i;
+      paint();
+    };
+    paint();
+  });
+  P.querySelector('#flipExp2').onclick = ()=>{ MY.exp = !MY.exp; syncExpToggle(); drawRate(); };
+  P.querySelector('#btnRateSave').onclick = saveRate;
+}
+
+let _saving = false;
+async function saveRate(){
+  if(_saving) return;                                  /* 더블탭 중복 등록 방지 */
+  const isCanteen = draft.target==='canteen';
+  if(isCanteen && !draft.stars){ alert('전체 만족도 별점을 선택해 주세요.'); return; }
+  if(!isCanteen && MY.exp && draft.cmp===null){ alert('구내식당과 비교한 결과를 선택해 주세요.'); return; }
+  if(!isCanteen && !MY.exp && draft.rec===null){ alert('추천 여부를 선택해 주세요.'); return; }
+
+  const who = ($('#who').value||'').trim().slice(0,40);
+  MY.nick = who; saveProfile();
+  const prev = myReviewOf(draft.target);
+  const rec = {
+    id: draft.target + '__' + DEV,                     /* 문서ID 고정 → 1기기 1평가 */
+    dev: DEV,
+    target: draft.target,
+    targetName: draft.targetName,
+    exp: !!MY.exp,
+    cmp: (!isCanteen && MY.exp) ? draft.cmp : null,
+    rec: (!isCanteen && !MY.exp) ? draft.rec : null,
+    stars: isCanteen ? draft.stars : (draft.stars||null),
+    taste: draft.taste||null, price: draft.price||null, speed: draft.speed||null,
+    comment: ($('#cmt').value||'').trim().slice(0,500),
+    who: who || '익명',
+    at: (prev && prev.at) || new Date().toISOString()
+  };
+
+  _saving = true;
+  const btn = $('#btnRateSave');
+  if(btn){ btn.disabled = true; btn.textContent = '저장 중…'; }
+  const lg = $('#rateLog'); lg.hidden=false; lg.innerHTML='저장 중…';
+
+  const how = await saveReviewFB(rec);
+  _saving = false;
+  if(btn){ btn.disabled = false; }
+  lg.innerHTML =
+      how==='shared' ? '<span class="g">✓ 등록되었습니다. 모두에게 실시간으로 공유됩니다.</span>'
+    : how==='queued' ? '<span class="y">✓ 저장되었습니다. 네트워크가 연결되면 자동으로 공유됩니다.</span>'
+    :                  '<span class="y">✓ 이 기기에 저장되었습니다. (공유 서버 미설정)</span>';
+  render();
+  setTimeout(closeAll, how==='shared' ? 800 : 1600);
+}
+
+function syncExpToggle(){
+  $$('#expToggle .opt').forEach(b=>b.setAttribute('aria-pressed', MY.exp!==null && (b.dataset.exp==='1')===MY.exp));
+}
+
+/* =========================================================================
+   8. Firebase(Firestore) 실시간 공유
+   ─ reviews 컬렉션   : 평가 1건 = 문서 1개, 문서ID = 식당ID__기기ID
+                        → 같은 사람이 같은 식당을 다시 평가하면 '수정'이 된다
+                        → 동시 저장 충돌·중복 누적이 구조적으로 불가능
+   ─ meta/overrides   : 식당 추가·삭제·영업상태(폐업 대조 결과) 공유 문서
+   ─ persistentLocalCache : 기기에 캐시 → 재접속 시 바뀐 문서만 내려받아
+                        읽기 요금·트래픽 절약, 오프라인에서도 열람 가능,
+                        오프라인 중 남긴 평가는 연결되면 SDK가 자동 전송
+   ========================================================================= */
+let db=null, FBM=null;
+
+async function initFirebase(){
+  FB_CFG = resolveFirebaseConfig();
+  if(!FB_CFG){                                          // 미설정 → 기기 저장 모드
+    fbState='local';
+    REVIEWS = (LS.get('reviews',[])).map(normalizeReview);
+    invalidateReviews(); renderSoon();
+    return;
+  }
+  fbState='connecting'; stamp();
+  try{
+    const appM = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js');
+    FBM        = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js');
+    const app = appM.initializeApp(FB_CFG);
+    try{
+      db = FBM.initializeFirestore(app, { localCache:
+             FBM.persistentLocalCache({ tabManager: FBM.persistentMultipleTabManager() }) });
+    }catch(e){ db = FBM.getFirestore(app); }            // 캐시 미지원 브라우저 대비
+
+    /* 평가 실시간 수신 — 누가 평가를 남기면 모든 화면이 곧바로 갱신된다 */
+    FBM.onSnapshot(FBM.collection(db,'reviews'),
+      snap=>{
+        REVIEWS = snap.docs.map(d=>normalizeReview({ id:d.id, ...d.data() }));
+        invalidateReviews();
+        fbState = snap.metadata.fromCache ? 'cache' : 'ok';
+        renderSoon();
+      },
+      err=>{ console.warn('reviews snapshot', err); fbState='err'; stamp();
+             toast('평가 데이터를 불러오지 못했습니다. 보안 규칙을 확인해 주세요.'); });
+
+    /* 목록 수정본 실시간 수신 */
+    FBM.onSnapshot(FBM.doc(db,'meta','overrides'),
+      snap=>{
+        if(snap.exists()) CURATION = Object.assign({removed:{},status:{},added:[]}, snap.data());
+        rebuildData(); buildChips(); renderSoon();
+      },
+      err=>{ console.warn('overrides snapshot', err); });
+  }catch(e){
+    console.warn('firebase load fail', e);
+    fbState='err';
+    REVIEWS = (LS.get('reviews',[])).map(normalizeReview);
+    invalidateReviews(); renderSoon();
+    toast('공유 서버에 연결하지 못했습니다 — 평가가 이 기기에만 저장됩니다');
+  }
+}
+
+/* 평가 저장. 반환: 'shared'(서버 확인) | 'queued'(오프라인 대기) | 'local' */
+function saveReviewFB(rec){
+  if(!db){                                              // 기기 저장 모드
+    REVIEWS = REVIEWS.filter(v=>v.id!==rec.id).concat([rec]);
+    LS.set('reviews', REVIEWS);
+    invalidateReviews(); renderSoon();
+    return Promise.resolve('local');
+  }
+  const {id, ...body} = rec;
+  const p = FBM.setDoc(FBM.doc(db,'reviews', id), { ...body, up: FBM.serverTimestamp() });
+  /* 오프라인이면 setDoc 은 서버 확인까지 대기한다.
+     2.5초 안에 확인되면 '공유 완료', 아니면 큐에 들어간 것으로 안내
+     (연결이 돌아오면 SDK가 자동 전송하므로 사용자는 더 할 일이 없다). */
+  return Promise.race([
+    p.then(()=> 'shared'),
+    new Promise(res=>setTimeout(()=>res('queued'), 2500))
+  ]).catch(()=> 'queued');
+}
+
+/* 목록 수정본(추가·삭제·영업상태)을 서버에 반영 — 관리자 조작에서 호출 */
+function pushCuration(){
+  CURATION.updatedAt = new Date().toISOString();
+  lastUpdate = new Date();
+  if(db) FBM.setDoc(FBM.doc(db,'meta','overrides'), CURATION).catch(e=>{
+    console.warn(e); toast('목록 변경을 서버에 저장하지 못했습니다');
+  });
+  else if(fbState!=='local') toast('서버 미연결 — 목록 변경이 이 기기에만 반영되었습니다');
+}
+
+/* 이 기기에서 남긴 평가 찾기(있으면 수정 모드) */
+function myReviewOf(target){ return REVIEWS.find(v=>v.target===target && v.dev===DEV) || null; }
+
+function normalizeReview(v){
+  const num = x => (x===''||x==null) ? null : (isNaN(+x)?null:+x);
+  return { id:String(v.id||''), dev:v.dev||'', target:String(v.target||''), targetName:v.targetName||'',
+           exp: v.exp===true||v.exp==='TRUE'||v.exp==='true'||v.exp===1,
+           cmp:num(v.cmp), rec:num(v.rec), stars:num(v.stars),
+           taste:num(v.taste), price:num(v.price), speed:num(v.speed),
+           comment:v.comment||'', who:v.who||'익명', at:v.at||'' };
+}
+
+/* =========================================================================
+   10. 인허가 데이터 대조 (업데이트)
+   ========================================================================= */
+const BRANCH = /(본점|직영점|[가-힣A-Za-z0-9]{1,10}점)$/;
+function norm(s){ return String(s||'').replace(/\(주\)|주식회사|㈜/g,'').replace(/[\s ]/g,'').replace(/[^가-힣a-zA-Z0-9]/g,'').toLowerCase(); }
+function normCore(s){ return norm(String(s||'').replace(/[\s ]/g,'').replace(BRANCH,'')); }
+function addrKey(a){ const m=String(a||'').match(/([가-힣0-9]+(?:로|길))\s*([0-9]+(?:-[0-9]+)?)/); return m?norm(m[1]+m[2]):''; }
+function classifyState(txt){
+  const t=String(txt||'');
+  if(/폐업|말소|취소|직권/.test(t)) return 'bad';
+  if(/휴업/.test(t)) return 'warn';
+  if(/영업|정상/.test(t)) return 'ok';
+  return null;
+}
+function reconcile(records){
+  const byName=new Map(), byCore=new Map(), byAddr=new Map();
+  records.forEach(rec=>{
+    const n=norm(rec.name), c=normCore(rec.name), a=addrKey(rec.addr);
+    if(n&&!byName.has(n)) byName.set(n,rec);
+    if(c&&!byCore.has(c)) byCore.set(c,rec);
+    if(a&&!byAddr.has(a)) byAddr.set(a,rec);
+  });
+  let ok=0,closed=0,rest=0,unknown=0; const removed=[],flagged=[];
+  DATA.forEach(r=>{
+    let rec = byName.get(norm(r.name)) || byCore.get(normCore(r.name));
+    if(!rec){
+      const ak=addrKey(r.address);
+      if(ak){ const c=byAddr.get(ak); if(c && normCore(c.name).slice(0,2)===normCore(r.name).slice(0,2)) rec=c; }
+    }
+    if(!rec){ unknown++; return; }
+    const st=classifyState(rec.state);
+    if(st==='bad'){ r.status='bad'; CURATION.removed[r.id]=true; closed++; removed.push(r.name); }
+    else if(st==='warn'){ r.status='warn'; r.note='인허가 데이터상 '+(rec.state||'휴업'); CURATION.status[r.id]={status:'warn',note:r.note}; rest++; flagged.push(r.name); }
+    else if(st==='ok'){ r.status='ok'; r.note=''; CURATION.status[r.id]={status:'ok',note:''}; ok++; }
+    else unknown++;
+  });
+  const before=DATA.length;
+  DATA = DATA.filter(r=>r.status!=='bad');
+  pushCuration();                                   /* 대조 결과를 모두에게 공유 */
+  logLine(`\n── 대조 결과 ──`);
+  logLine(`인허가 레코드 ${records.length.toLocaleString()}건과 대조`);
+  logLine(`<span class="g">영업 확인 ${ok}곳 → 유지</span>`);
+  logLine(`<span class="r">폐업 확인 ${closed}곳 → 삭제</span>${removed.length?' : '+removed.join(', '):''}`);
+  logLine(`<span class="y">휴업/확인필요 ${rest}곳 → 표시만</span>${flagged.length?' : '+flagged.join(', '):''}`);
+  logLine(`미확인 ${unknown}곳 → 유지`);
+  logLine(`목록 ${before}곳 → ${DATA.length}곳`);
+  buildChips(); render();
+}
+function logLine(html){ const el=$('#log'); el.hidden=false; el.insertAdjacentHTML('beforeend', html+'\n'); el.scrollTop=el.scrollHeight; }
+function logClear(){ const el=$('#log'); el.innerHTML=''; el.hidden=true; }
+function progress(p){ const b=$('#bar'); b.hidden=p==null; if(p!=null) b.firstElementChild.style.width=(p*100)+'%'; }
+
+const NAME_KEYS =['사업장명','업소명','상호','상호명','bplcnm','bplc_nm','businessname'];
+const STATE_KEYS=['상세영업상태명','영업상태명','영업상태구분','상태','dtlstatenm','trdstatenm','dtl_state_nm','trd_state_nm'];
+const ADDR_KEYS =['도로명전체주소','도로명주소','소재지전체주소','지번주소','주소','rdnwhladdr','sitewhladdr','rdn_whl_addr'];
+function pickKey(keys,cands){
+  const low=keys.map(k=>String(k).replace(/[\s"']/g,'').toLowerCase());
+  for(const c of cands){ const i=low.indexOf(c); if(i>=0) return keys[i]; }
+  for(const c of cands){ const i=low.findIndex(k=>k.includes(c)); if(i>=0) return keys[i]; }
+  return null;
+}
+function parseCSV(text){
+  const rows=[]; let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+    else{
+      if(ch==='"') q=true;
+      else if(ch===','){ row.push(cur); cur=''; }
+      else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+      else if(ch==='\r'){}
+      else cur+=ch;
+    }
+  }
+  if(cur!=='' || row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(r=>r.length>1);
+}
+function recordsFromRows(objs){
+  if(!objs.length) return [];
+  const keys=Object.keys(objs[0]);
+  const kn=pickKey(keys,NAME_KEYS), ks=pickKey(keys,STATE_KEYS), ka=pickKey(keys,ADDR_KEYS);
+  if(!kn||!ks){
+    logLine(`<span class="r">✕ 사업장명/영업상태 열을 찾지 못했습니다.</span>`);
+    logLine(`발견된 열: ${keys.slice(0,25).join(', ')}${keys.length>25?' …':''}`);
+    return null;
+  }
+  logLine(`열 매핑 → 상호: <b>${esc(kn)}</b> / 상태: <b>${esc(ks)}</b> / 주소: <b>${ka?esc(ka):'(없음)'}</b>`);
+  return objs.map(o=>({name:o[kn],state:o[ks],addr:ka?o[ka]:''})).filter(r=>r.name);
+}
+function extractRows(json){
+  let best=[];
+  (function walk(v){
+    if(Array.isArray(v)){
+      if(v.length && typeof v[0]==='object' && v[0] && !Array.isArray(v[0])){ if(v.length>best.length) best=v; }
+      v.forEach(walk);
+    } else if(v && typeof v==='object') Object.values(v).forEach(walk);
+  })(json);
+  return best;
+}
+async function handleFile(file){
+  logClear(); progress(null);
+  logLine(`파일: <b>${esc(file.name)}</b> (${(file.size/1024/1024).toFixed(2)} MB)`);
+  const buf = await file.arrayBuffer();
+  let text;
+  try{ text = new TextDecoder('utf-8',{fatal:true}).decode(buf); }
+  catch(_){ try{ text=new TextDecoder('euc-kr').decode(buf); logLine('인코딩: CP949(EUC-KR)로 해석'); }catch(e){ text=new TextDecoder('utf-8').decode(buf); } }
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+  if(/ /.test(text.slice(0,3000))){ try{ text=new TextDecoder('euc-kr').decode(buf); logLine('인코딩: CP949(EUC-KR)로 재해석'); }catch(_){} }
+  let objs=[]; const t=text.trim();
+  if(t.startsWith('{')||t.startsWith('[')){
+    let json; try{ json=JSON.parse(t); }catch(e){ logLine(`<span class="r">✕ JSON 파싱 실패: ${esc(e.message)}</span>`); return; }
+    objs=extractRows(json); logLine(`JSON에서 ${objs.length.toLocaleString()}건 추출`);
+  }else{
+    const rows=parseCSV(text);
+    if(rows.length<2){ logLine('<span class="r">✕ CSV 내용을 읽지 못했습니다.</span>'); return; }
+    const head=rows[0].map(h=>h.trim().replace(/^"|"$/g,''));
+    objs=rows.slice(1).map(r=>{const o={};head.forEach((h,i)=>o[h]=(r[i]||'').trim());return o;});
+    logLine(`CSV에서 ${objs.length.toLocaleString()}행 읽음`);
+  }
+  const recs=recordsFromRows(objs); if(recs) reconcile(recs);
+}
+function buildApiUrl(page){
+  const preset=$('#apiPreset').value, key=$('#apiKey').value.trim(), local=$('#apiLocal').value.trim()||'3690000';
+  if(preset==='localdata')
+    return `https://www.localdata.go.kr/platform/rest/TO0/openDataApi?authKey=${enc(key)}&opnSvcId=07_24_04_P&localCode=${enc(local)}&pageIndex=${page}&pageSize=500&resultType=json`;
+  const ep=$('#apiEndpoint').value.trim().replace(/\?.*$/,'');
+  if(!ep) return null;
+  const sep = ep.includes('?')?'&':'?';
+  return `${ep}${sep}serviceKey=${enc(key)}&authKey=${enc(key)}&localCode=${enc(local)}&opnSvcId=07_24_04_P&pageNo=${page}&pageIndex=${page}&numOfRows=500&pageSize=500&type=json&resultType=json`;
+}
+function withProxy(u){ const p=$('#apiProxy').value.trim(); return p ? p+enc(u) : u; }
+async function runApi(){
+  logClear(); progress(0);
+  if(!$('#apiKey').value.trim()){ logLine('<span class="r">✕ 인증키를 입력해 주세요.</span>'); progress(null); return; }
+  const all=[];
+  try{
+    for(let page=1;page<=10;page++){
+      const url=buildApiUrl(page);
+      if(!url){ logLine('<span class="r">✕ 엔드포인트 URL을 입력해 주세요.</span>'); progress(null); return; }
+      logLine(`요청 ${page}페이지…`);
+      const res=await fetch(withProxy(url),{headers:{'Accept':'application/json'}});
+      if(!res.ok){ logLine(`<span class="r">✕ HTTP ${res.status}</span>`); break; }
+      const txt=await res.text(); let json;
+      try{ json=JSON.parse(txt); }catch(e){ logLine('<span class="r">✕ JSON이 아닌 응답 (인증키·엔드포인트 확인)</span>'); logLine(esc(txt.slice(0,300))); break; }
+      const rows=extractRows(json);
+      if(!rows.length){ logLine('더 이상 데이터가 없습니다.'); break; }
+      all.push(...rows); logLine(`  → 누적 ${all.length.toLocaleString()}건`);
+      progress(Math.min(0.9,page/10));
+      if(rows.length<500) break;
+    }
+  }catch(e){
+    logLine(`<span class="r">✕ 호출 실패: ${esc(e.message)}</span>`);
+    logLine('<span class="y">브라우저가 외부 도메인 호출을 차단(CORS)했거나 네트워크 오류입니다.\n① 파일 방식을 쓰시거나 프록시 주소를 입력해 주세요.</span>');
+  }
+  progress(null);
+  if(!all.length) return;
+  const recs=recordsFromRows(all); if(recs) reconcile(recs);
+}
+const manualMark={};
+function buildManual(){
+  const box=$('#revList');
+  box.innerHTML = DATA.map(r=>`
+    <div class="rev-row" data-id="${r.id}">
+      <span class="nm">${esc(r.name)}<span style="font-weight:400;color:var(--ink3)"> · ${esc(r.category)}</span></span>
+      <a href="${webSearch(r)}" target="_blank" rel="noopener">검색</a>
+      <button class="y" data-m="ok" aria-pressed="${manualMark[r.id]==='ok'}">✓</button>
+      <button class="n" data-m="bad" aria-pressed="${manualMark[r.id]==='bad'}">✕</button>
+    </div>`).join('');
+  box.onclick=e=>{
+    const b=e.target.closest('[data-m]'); if(!b) return;
+    const id=b.closest('.rev-row').dataset.id;
+    manualMark[id] = manualMark[id]===b.dataset.m ? null : b.dataset.m;
+    buildManual();
+  };
+}
+
+/* =========================================================================
+   11. 백업(내보내기) · 예전 JSON 평가 이관
+   ========================================================================= */
+function exportJSON(){
+  const payload={ origin:ORIGIN, exportedAt:new Date().toISOString(),
+                  count:DATA.length, restaurants:DATA, reviews:REVIEWS };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`교육원주변_식당·평가_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* 예전 파일 배포판에서 [내보내기]한 JSON의 평가를 Firestore로 올린다 */
+async function migrateFiles(files){
+  const lg=$('#ioLog'); lg.hidden=false; lg.innerHTML='';
+  if(!db){ lg.innerHTML='<span class="r">✕ Firebase가 연결돼 있어야 이관할 수 있습니다.</span>'; return; }
+  const seen=new Set(REVIEWS.map(v=>v.id));
+  let total=0, added=0;
+  for(const f of files){
+    try{
+      const j=JSON.parse(await f.text());
+      const rv=Array.isArray(j.reviews)?j.reviews:(Array.isArray(j)?j:[]);
+      for(const raw of rv){
+        total++;
+        if(!raw || !raw.id || seen.has(String(raw.id))) continue;
+        const v=normalizeReview(raw);
+        v.id = v.id.replace(/[\/#?\[\]]/g,'_');
+        await FBM.setDoc(FBM.doc(db,'reviews', v.id), { ...v, up: FBM.serverTimestamp() });
+        seen.add(v.id); added++;
+      }
+      lg.insertAdjacentHTML('beforeend', `<span class="g">✓</span> ${esc(f.name)} — 평가 ${rv.length}건\n`);
+    }catch(e){ lg.insertAdjacentHTML('beforeend', `<span class="r">✕</span> ${esc(f.name)} — ${esc(e.message)}\n`); }
+  }
+  lg.insertAdjacentHTML('beforeend', `\n총 ${total}건 확인, 새 평가 <b>${added}건</b>을 서버로 올렸습니다.\n`);
+}
+
+/* =========================================================================
+   12. 이벤트 배선
+   ========================================================================= */
+function open(id){ $(id).classList.add('on'); document.body.classList.add('locked'); }
+function closeAll(){
+  $$('.mask').forEach(m=>m.classList.remove('on'));
+  document.body.classList.remove('locked');
+}
+$$('.mask').forEach(m=>m.addEventListener('click', e=>{ if(e.target===m||e.target.hasAttribute('data-close')) closeAll(); }));
+document.addEventListener('click', e=>{ if(e.target.hasAttribute&&e.target.hasAttribute('data-close')) closeAll(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAll(); });
+
+/* 모바일에서 상단바 접기 */
+(function(){
+  const hd = document.querySelector('header');
+  let last = false, ticking = false;
+  function apply(){
+    ticking = false;
+    if(window.innerWidth > 700){ if(last){ hd.classList.remove('compact'); last=false; } return; }
+    const want = window.scrollY > 70;
+    if(want !== last){ hd.classList.toggle('compact', want); last = want; }
+  }
+  window.addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(apply); } }, {passive:true});
+  window.addEventListener('resize', apply);
+})();
+
+let _rafPending = false;
+function renderSoon(){                              /* 같은 프레임에 몰린 렌더 요청을 1회로 합침 */
+  if(_rafPending) return;
+  _rafPending = true;
+  requestAnimationFrame(()=>{ _rafPending = false; render(); });
+}
+let _qTimer = null;
+$('#q').addEventListener('input', ()=>{             /* 타이핑마다 60장 다시 그리지 않도록 지연 */
+  clearTimeout(_qTimer);
+  _qTimer = setTimeout(renderSoon, 140);
+});
+$('#sortDist').addEventListener('change', renderSoon);
+$('#radius').addEventListener('change', renderSoon);
+$('#hideClosed').addEventListener('change', renderSoon);
+$('#onlyRated').addEventListener('change', renderSoon);
+$('#showAll').addEventListener('change', e=>{ showAllTiers=e.target.checked; renderSoon(); });
+$('#btnReshuffle').onclick = ()=>{
+  sampleSeed = (sampleSeed*1103515245 + 12345) >>> 0;
+  render();
+  toast('2km 밖 표본을 다시 뽑았습니다 · 2km 이내와 평가된 곳은 그대로');
+};
+
+$('#btnUpdate').onclick = ()=>{ logClear(); progress(null); buildManual(); open('#mUpdate'); };
+$('#btnIO').onclick = ()=>open('#mIO');
+function syncProviderToggle(){
+  $$('#mapProviderToggle .opt').forEach(b=>b.setAttribute('aria-pressed', b.dataset.prov===MAP_PROVIDER));
+}
+$('#mapProviderToggle').onclick = e=>{
+  const b=e.target.closest('[data-prov]'); if(!b) return;
+  MAP_PROVIDER=b.dataset.prov; saveProfile(); syncProviderToggle(); render();
+  toast(`길찾기를 ${ro(providerLabel())} 엽니다`);
+};
+$('#btnSetup').onclick = ()=>{ $('#nick').value=MY.nick; $('#fbStat').innerHTML=fbStatText()+(FB_CFG?` · 프로젝트 <b>${esc(FB_CFG.projectId)}</b>`:' · index.html 상단 FIREBASE_CONFIG 를 채워 주세요'); syncExpToggle(); syncProviderToggle(); open('#mSetup'); };
+$('#btnAdd').onclick = ()=>{ $('#aCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join(''); open('#mAdd'); };
+
+$$('.tab').forEach(t=>t.onclick=()=>{
+  $$('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));
+  $$('[data-pane]').forEach(p=>p.hidden = p.dataset.pane!==t.dataset.tab);
+});
+$('#apiPreset').onchange = e=>{ $('#fEndpoint').hidden = e.target.value==='localdata'; };
+
+const drop=$('#drop'), fileIn=$('#fileIn');
+drop.onclick=()=>fileIn.click();
+fileIn.onchange=e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); };
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0]; if(f) handleFile(f);});
+$('#btnApiRun').onclick = runApi;
+$('#btnManAllOk').onclick = ()=>{ DATA.forEach(r=>manualMark[r.id]='ok'); buildManual(); };
+$('#btnManApply').onclick = ()=>{
+  const kill=DATA.filter(r=>manualMark[r.id]==='bad'), keep=DATA.filter(r=>manualMark[r.id]==='ok');
+  if(!kill.length && !keep.length){ alert('확인 표시를 먼저 해주세요.'); return; }
+  keep.forEach(r=>{ r.status='ok'; r.note=''; CURATION.status[r.id]={status:'ok',note:''}; });
+  kill.forEach(r=>{ CURATION.removed[r.id]=true; });
+  DATA=DATA.filter(r=>manualMark[r.id]!=='bad');
+  pushCuration(); logClear();
+  logLine('── 수동 확인 결과 ──');
+  logLine(`<span class="g">운영 확인 ${keep.length}곳 → 유지</span>`);
+  logLine(`<span class="r">폐업 표시 ${kill.length}곳 → 삭제</span>${kill.length?' : '+kill.map(r=>r.name).join(', '):''}`);
+  logLine(`목록 현재 ${DATA.length}곳`);
+  buildChips(); render(); buildManual();
+};
+
+$('#btnAddSave').onclick = ()=>{
+  const name=$('#aName').value.trim();
+  if(!name){ alert('상호명을 입력해 주세요.'); return; }
+  CURATION.added.push({ id:'n'+Date.now(), name, category:$('#aCat').value, menu:$('#aMenu').value.trim(),
+    address:$('#aAddr').value.trim(), tel:$('#aTel').value.trim(),
+    dist:parseFloat($('#aDist').value)||1.0, zone:'직접 추가', status:'new', note:'' });
+  pushCuration(); rebuildData();
+  ['#aName','#aMenu','#aAddr','#aTel','#aDist'].forEach(s=>$(s).value='');
+  buildChips(); render(); closeAll();
+};
+
+$('#btnExport').onclick = exportJSON;
+$('#btnMigrate').onclick = ()=>$('#mgFile').click();
+$('#mgFile').onchange = e=>{ if(e.target.files.length) migrateFiles([...e.target.files]); };
+
+$('#nick').addEventListener('change', e=>{ MY.nick=e.target.value.trim(); saveProfile(); });
+$$('[data-copy-origin]').forEach(b=>b.onclick = ()=>copyOrigin());
+$('#expToggle').onclick = e=>{
+  const b=e.target.closest('[data-exp]'); if(!b) return;
+  MY.exp=b.dataset.exp==='1'; saveProfile(); syncExpToggle(); render();
+};
+$('#btnAdminOff').onclick = ()=>{
+  LS.set('admin', false); document.body.classList.remove('admin');
+  closeAll(); toast('관리자 모드를 껐습니다');
+};
+
+/* 관리자 모드 — 주소 뒤에 #admin 을 붙여 열면 켜지고, 이 기기에 기억된다.
+   교육생 배포용 URL에는 #admin 을 붙이지 않는다. */
+function applyAdmin(){
+  if(location.hash.replace('#','')==='admin') LS.set('admin', true);
+  document.body.classList.toggle('admin', LS.get('admin', false));
+}
+applyAdmin();
+window.addEventListener('hashchange', applyAdmin);
+
+/* init — SEED로 즉시 화면을 그린 뒤(서버 대기 없음) Firebase 를 연결한다 */
+buildChips(); render();
+initFirebase();
+window.addEventListener('online',  stamp);
+window.addEventListener('offline', ()=>{ if(fbState==='ok') fbState='cache'; stamp(); });
+
+</script>
+</body>
+</html>

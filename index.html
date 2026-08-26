@@ -13,6 +13,10 @@
     --warn:#b06f00; --warn-soft:#fdf1dc;
     --bad:#c02626; --bad-soft:#fdeaea;
     --gold:#f0a202;
+    /* 상단(제목·검색·업종) 영역 바탕 — 옅은 파란색 */
+    --head:#cfe0fb; --head-line:#a8c6ef;
+    /* 업종색 카드 위에 얹히는 안쪽 상자(평가 줄·후기) 바탕 */
+    --inner:rgba(255,255,255,.62);
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 4px 14px rgba(16,24,40,.06);
     --r:14px;
   }
@@ -25,6 +29,8 @@
       --warn:#e8b45c; --warn-soft:#2b2413;
       --bad:#ff7b7b; --bad-soft:#2e1717;
       --gold:#ffc043;
+      --head:#182741; --head-line:#2c3f61;
+      --inner:rgba(255,255,255,.06);
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
     }
   }
@@ -43,7 +49,7 @@
   .wrap{max-width:980px;margin:0 auto;padding:0 16px 100px}
 
   /* ---------- header ---------- */
-  header{position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--line);padding:13px 0 0}
+  header{position:sticky;top:0;z-index:40;background:var(--head);border-bottom:1px solid var(--head-line);padding:13px 0 0}
   .hd-in{max-width:980px;margin:0 auto;padding:0 16px}
   .title{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   h1{font-size:19px;margin:0;letter-spacing:-.4px}
@@ -141,8 +147,11 @@
   .chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 11px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .chips::-webkit-scrollbar{display:none}
   .chips::-webkit-scrollbar{display:none}
-  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:600;transition:.12s}
+  /* 업종 칩(=찾기 버튼)은 그 업종의 색을 그대로 입는다 */
+  .chip{border:1px solid var(--line);background:var(--cbg,var(--card));color:var(--cfg,var(--ink2));padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:700;transition:.12s}
+  .chip[data-cat]{border-color:var(--cbg,var(--line))}
   .chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+  .chip[data-cat][aria-pressed="true"]{background:var(--cfg,var(--brand));border-color:var(--cfg,var(--brand));color:#fff}
   .chip .n{opacity:.65;margin-left:4px;font-size:11.5px;font-weight:500}
 
   /* ---------- 기준선: 구내식당 ---------- */
@@ -173,27 +182,38 @@
   .group-h::after{content:"";flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr));gap:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:9px;transition:.15s}
+  /* 업종은 배지 대신 카드 바탕색으로 알린다 (색은 상단 업종 칩과 같다).
+     글자가 묻히지 않도록 카드 바탕색만 흰색(어두운 모드는 카드색) 쪽으로 옅게 섞는다. */
+  .card[data-c]{
+    background:var(--cbg);
+    background:color-mix(in srgb, var(--cbg) 60%, var(--card));
+    border-color:var(--cbg);
+    border-color:color-mix(in srgb, var(--cfg) 22%, var(--line));
+  }
+  .card[data-c] .c-act{border-top-color:color-mix(in srgb, var(--cfg) 18%, var(--line2))}
   .card.closed{opacity:.55}
   .c-top{display:flex;align-items:flex-start;gap:8px}
   .c-name{font-size:15.5px;font-weight:800;letter-spacing:-.3px;flex:1;min-width:0}
-  .cat{font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px;white-space:nowrap;background:var(--line2);color:var(--ink2)}
-  .cat[data-c="한식"]{background:#fff0e6;color:#b1541a}
-  .cat[data-c="중식"]{background:#ffe9e9;color:#b32626}
-  .cat[data-c="일식"]{background:#e7f0ff;color:#1e4fbe}
-  .cat[data-c="양식"]{background:#f0e9ff;color:#5c34ba}
-  .cat[data-c="고기·구이"]{background:#ffe8f0;color:#b32463}
-  .cat[data-c="분식·기타"]{background:#e6f7ef;color:#0d7a4b}
-  .cat[data-c="치킨·주점"]{background:#fdf3d8;color:#8f6200}
-  .cat[data-c="카페·디저트"]{background:#eaf3f6;color:#2b6d80}
+  .cat{font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px;white-space:nowrap;
+    background:var(--cbg,var(--line2));color:var(--cfg,var(--ink2))}
+  /* ── 업종 팔레트 — 칩·카드·배지가 같은 두 값(--cbg 바탕 / --cfg 글자)을 함께 쓴다 ── */
+  .cat[data-c="한식"],      .chip[data-cat="한식"],      .card[data-c="한식"]     {--cbg:#fff0e6;--cfg:#b1541a}
+  .cat[data-c="중식"],      .chip[data-cat="중식"],      .card[data-c="중식"]     {--cbg:#ffe9e9;--cfg:#b32626}
+  .cat[data-c="일식"],      .chip[data-cat="일식"],      .card[data-c="일식"]     {--cbg:#e7f0ff;--cfg:#1e4fbe}
+  .cat[data-c="양식"],      .chip[data-cat="양식"],      .card[data-c="양식"]     {--cbg:#f0e9ff;--cfg:#5c34ba}
+  .cat[data-c="고기·구이"],  .chip[data-cat="고기·구이"],  .card[data-c="고기·구이"] {--cbg:#ffe8f0;--cfg:#b32463}
+  .cat[data-c="분식·기타"],  .chip[data-cat="분식·기타"],  .card[data-c="분식·기타"] {--cbg:#e6f7ef;--cfg:#0d7a4b}
+  .cat[data-c="치킨·주점"],  .chip[data-cat="치킨·주점"],  .card[data-c="치킨·주점"] {--cbg:#fdf3d8;--cfg:#8f6200}
+  .cat[data-c="카페·디저트"],.chip[data-cat="카페·디저트"],.card[data-c="카페·디저트"]{--cbg:#eaf3f6;--cfg:#2b6d80}
   @media (prefers-color-scheme: dark){
-    .cat[data-c="한식"]{background:#3a2415;color:#f0ac74}
-    .cat[data-c="중식"]{background:#3a1a1a;color:#ff9a9a}
-    .cat[data-c="일식"]{background:#16233d;color:#8fb4ff}
-    .cat[data-c="양식"]{background:#251a3d;color:#b79bff}
-    .cat[data-c="고기·구이"]{background:#3a1728;color:#ff9ac2}
-    .cat[data-c="분식·기타"]{background:#123024;color:#6fd8a6}
-    .cat[data-c="치킨·주점"]{background:#332612;color:#f0c46a}
-    .cat[data-c="카페·디저트"]{background:#152a31;color:#84c4d6}
+    .cat[data-c="한식"],      .chip[data-cat="한식"],      .card[data-c="한식"]     {--cbg:#3a2415;--cfg:#f0ac74}
+    .cat[data-c="중식"],      .chip[data-cat="중식"],      .card[data-c="중식"]     {--cbg:#3a1a1a;--cfg:#ff9a9a}
+    .cat[data-c="일식"],      .chip[data-cat="일식"],      .card[data-c="일식"]     {--cbg:#16233d;--cfg:#8fb4ff}
+    .cat[data-c="양식"],      .chip[data-cat="양식"],      .card[data-c="양식"]     {--cbg:#251a3d;--cfg:#b79bff}
+    .cat[data-c="고기·구이"],  .chip[data-cat="고기·구이"],  .card[data-c="고기·구이"] {--cbg:#3a1728;--cfg:#ff9ac2}
+    .cat[data-c="분식·기타"],  .chip[data-cat="분식·기타"],  .card[data-c="분식·기타"] {--cbg:#123024;--cfg:#6fd8a6}
+    .cat[data-c="치킨·주점"],  .chip[data-cat="치킨·주점"],  .card[data-c="치킨·주점"] {--cbg:#332612;--cfg:#f0c46a}
+    .cat[data-c="카페·디저트"],.chip[data-cat="카페·디저트"],.card[data-c="카페·디저트"]{--cbg:#152a31;--cfg:#84c4d6}
   }
   .c-menu{font-size:13px;color:var(--ink2);line-height:1.45}
   .c-meta{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:12.2px;color:var(--ink3)}
@@ -205,7 +225,24 @@
   .status.new{background:var(--brand-soft);color:var(--brand)}
 
   /* 판단 배지 */
-  .verdict{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--line2);border-radius:10px;padding:8px 10px}
+  .verdict{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--inner);border-radius:10px;padding:8px 10px}
+  /* 평가가 있는 곳은 한 줄로 접어 두고, 그 줄을 누르면 상세가 펼쳐진다 */
+  .vline{display:flex;align-items:center;gap:8px;width:100%;min-width:0;text-align:left;
+    background:var(--inner);border:1px solid transparent;border-radius:10px;padding:8px 10px;
+    font-family:inherit;font-size:12px;color:var(--ink2);cursor:pointer;transition:.12s}
+  @media(hover:hover){ .vline:hover{border-color:var(--cfg,var(--brand))} }
+  .vline.flat{cursor:default}
+  .vline .vb{flex:0 0 auto}
+  .vsum{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .vsum .who{font-weight:500}
+  .vsum .dim{color:var(--ink3);font-weight:500}
+  .vsum .cmt-body{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vsum.dim{color:var(--ink3);font-weight:500}
+  .vcnt{flex:0 0 auto;color:var(--ink3);font-weight:700;font-size:11.5px}
+  .caret{flex:0 0 auto;color:var(--cfg,var(--ink3));font-size:11px;transition:transform .15s}
+  .vline[aria-expanded="true"] .caret{transform:rotate(180deg)}
+  .vdetail{display:flex;flex-direction:column;gap:8px}
+  @media(max-width:700px){ .vline{min-height:44px;font-size:12.5px} }
   .vb{font-size:12px;font-weight:900;padding:4px 10px;border-radius:8px;white-space:nowrap;letter-spacing:-.2px}
   .vb.go{background:var(--ok);color:#fff}
   .vb.maybe{background:#2e7ad1;color:#fff}
@@ -216,7 +253,7 @@
   .vmeta .dim{color:var(--ink3);font-weight:500}
   .scores{display:flex;gap:10px;flex-wrap:wrap;font-size:11.8px;color:var(--ink3)}
   .scores b{color:var(--ink2)}
-  .cmt{font-size:12px;color:var(--ink2);background:var(--line2);border-radius:9px;padding:7px 9px;line-height:1.5}
+  .cmt{font-size:12px;color:var(--ink2);background:var(--inner);border-radius:9px;padding:7px 9px;line-height:1.5}
   .cmt .who{color:var(--ink3);font-size:11px}
   /* 후기가 2개 이상이면 일정 간격으로 돌아가며 보여준다.
      교체 순간에만 살짝 흐려졌다 돌아온다(글자가 튀지 않도록 위치는 고정). */
@@ -411,7 +448,7 @@
         <option value="99" selected>전체</option>
       </select>
     </label>
-    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="onlyRated"> 평가 있는 곳만</label>
+    <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="sortRated"> 평가 많은 순</label>
     <label class="admin-only" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="showAll"> 표본 무시하고 전체</label>
     <button class="btn sm admin-only" id="btnReshuffle" title="2km 밖 표본을 다시 뽑습니다">🎲 다시 섞기</button>
     <span class="count" id="count"></span>
@@ -832,7 +869,7 @@ let MY = { exp:null, nick:'' };   // exp: true(경험있음) / false(없음) / n
 let filterCat = '전체';
 let lastUpdate = null;
 let fbState = 'off';              // off | connecting | ok | cache | local | err
-const expandedCmt = {};
+const expandedRev = {};   /* 카드별 '평가 상세 펼침' 상태 */
 
 /* ── 기기 로컬 저장(localStorage): 프로필·기기ID·로컬모드 평가 ──────────
    예전 버전은 새로고침하면 모든 상태가 사라졌다. 이제 닉네임·경험 여부·
@@ -1193,12 +1230,10 @@ function buildChips(){
 function visible(){
   const q = $('#q').value.trim().toLowerCase();
   const rad = parseFloat($('#radius').value);
-  const onlyRated = $('#onlyRated').checked;
   let rows = DATA.filter(r=>{
     if(filterCat!=='전체' && r.category!==filterCat) return false;
     if((r.dist||0) > rad) return false;
     if(r.status==='bad') return false;                 /* 폐업 확인된 곳은 항상 숨긴다 */
-    if(onlyRated && !hasReview(r.id)) return false;
     if(!inSample(r)) return false;
     if(q){
       const hay = (r.name+' '+r.menu+' '+r.address+' '+r.category+' '+(r.zone||'')).toLowerCase();
@@ -1206,9 +1241,17 @@ function visible(){
     }
     return true;
   });
-  /* 기본은 상호명순, '거리순 정렬'을 켜면 가까운 순 */
-  const byDist = $('#sortDist').checked;
+  /* 기본은 상호명순, '거리순 정렬'은 가까운 순, '평가 많은 순'은 평가 건수가 많은 순.
+     (두 정렬은 서로 배타 — 한쪽을 켜면 다른 쪽은 자동으로 꺼진다) */
+  const byDist  = $('#sortDist').checked;
+  const byRated = $('#sortRated').checked;
   rows.sort((a,b)=>{
+    if(byRated){
+      const n = agg(b.id).n - agg(a.id).n;             /* 평가 많은 곳이 위로 */
+      if(n !== 0) return n;
+      const d = (a.dist ?? 99) - (b.dist ?? 99);       /* 건수가 같으면 가까운 순 */
+      if(d !== 0) return d;
+    }
     if(byDist){
       const d = (a.dist ?? 99) - (b.dist ?? 99);
       if(d !== 0) return d;
@@ -1315,41 +1358,52 @@ window.__diag = function(){
 function card(r){
   const a = agg(r.id), v = verdict(a), lt = lunchTag(r.dist||0);
   const few = a.n>0 && a.n<3;
-  let vmeta;
-  if(!a.n) vmeta = `<span class="vmeta dim">아직 응답이 없습니다 · 첫 평가를 남겨 주세요</span>`;
-  else{
-    const bits=[];
-    if(a.nCmp) bits.push(`교육원 대비 <b>${signed(a.cmpAvg)}</b>`);
-    if(a.nRec) bits.push(`추천 <b>${a.recAvg.toFixed(1)}</b>/4`);
-    vmeta = `<span class="vmeta">${bits.join(' · ')} <span class="dim">· ${a.n}명${few?' · 표본 적음':''}</span></span>`;
-  }
+  const open = !!expandedRev[r.id];
+
+  /* 평가 요약(한 줄에 들어갈 짧은 문구) */
+  const bits=[];
+  if(a.nCmp) bits.push(`교육원 대비 <b>${signed(a.cmpAvg)}</b>`);
+  if(a.nRec) bits.push(`추천 <b>${a.recAvg.toFixed(1)}</b>/4`);
+  const brief = (bits.length ? bits.join(' · ') : '눌러서 평가 자세히 보기')
+              + (few ? ' <span class="dim">· 표본 적음</span>' : '');
+  const vmeta = a.n
+    ? `<span class="vmeta">${bits.join(' · ')} <span class="dim">· ${a.n}명${few?' · 표본 적음':''}</span></span>`
+    : `<span class="vmeta dim">아직 응답이 없습니다 · 첫 평가를 남겨 주세요</span>`;
   const sc = ASPECTS.filter(x=>a[x.k]!=null).map(x=>`<span>${x.t} <b>${a[x.k].toFixed(1)}</b></span>`).join('');
-  const open = expandedCmt[r.id];
+
+  /* 평가가 있으면 한 줄로 접어 둔다.
+     · 접힌 줄: 판단 배지 + (후기가 있으면 후기 한 줄, 없으면 요약) + 인원 + ▾
+     · 후기가 2개 이상이고 접혀 있을 때만 순환시킨다(펼치면 아래에 전부 보이므로 불필요) */
+  const rot = !open && a.comments.length>1;
+  const ci  = rot ? (cmtTick % a.comments.length) : 0;
+  const line = a.n
+    ? `<button class="vline" data-rev="${r.id}" aria-expanded="${open}"${rot?` data-rot="${r.id}"`:''}
+              title="${open?'평가 접기':'눌러서 평가 자세히 보기'}">
+         <span class="vb ${v.cls}">${v.t}</span>
+         <span class="vsum"><span class="cmt-body">${(!open && a.comments.length)?cmtHTML(a.comments[ci]):brief}</span></span>
+         <span class="vcnt">${a.n}명</span>
+         <span class="caret">▾</span>
+       </button>
+       ${open?`<div class="vdetail">
+         <div class="verdict">${vmeta}</div>
+         ${sc?`<div class="scores">${sc}</div>`:''}
+         ${a.comments.map(c=>`<div class="cmt">${cmtHTML(c)}</div>`).join('')}
+         ${(!sc && !a.comments.length)?`<div class="cmt">세부 점수와 한 줄 평은 아직 없습니다.</div>`:''}
+       </div>`:''}`
+    : `<div class="vline flat">
+         <span class="vb ${v.cls}">${v.t}</span>
+         <span class="vsum dim">아직 응답이 없습니다 · 첫 평가를 남겨 주세요</span>
+       </div>`;
+
   return `
-  <article class="card ${r.status==='bad'?'closed':''}">
+  <article class="card ${r.status==='bad'?'closed':''}" data-c="${esc(r.category)}">
     <div class="c-top">
       <div class="c-name">${esc(r.name)}</div>
-      <span class="cat" data-c="${esc(r.category)}">${esc(r.category)}</span>
       <button class="mini rate rate-top" data-rate="${r.id}">${myReviewOf(r.id)?'✏️ 내 평가':'⭐ 평가'}</button>
     </div>
     ${r.menu?`<div class="c-menu">${esc(r.menu)}</div>`:''}
 
-    <div class="verdict">
-      <span class="vb ${v.cls}">${v.t}</span>
-      ${vmeta}
-    </div>
-    ${sc?`<div class="scores">${sc}</div>`:''}
-    ${a.comments.length?(()=>{
-      /* 펼쳐 놓았을 땐 순환하지 않는다 — 아래에 전체 목록이 이미 보이기 때문 */
-      const rot = a.comments.length>1 && !open;
-      const i   = rot ? (cmtTick % a.comments.length) : 0;
-      return `
-      <div class="cmt${rot?' rot':''}"${rot?` data-rot="${r.id}"`:''}>
-        <span class="cmt-body">${cmtHTML(a.comments[i])}</span>
-      </div>
-      ${a.comments.length>1?`<button class="lnk" data-cmt="${r.id}">${open?'후기 접기':'후기 '+a.comments.length+'개 모두 보기'}</button>`:''}
-      ${open?a.comments.slice(1).map(c=>`<div class="cmt">${cmtHTML(c)}</div>`).join(''):''}`;
-    })():''}
+    ${line}
 
     <div class="c-meta">
       ${statusBadge(r, a)}
@@ -1415,8 +1469,8 @@ $('#list').addEventListener('click', e=>{
   }
   const rt = e.target.closest('[data-rate]');
   if(rt){ openRate(rt.dataset.rate); return; }
-  const ct = e.target.closest('[data-cmt]');
-  if(ct){ expandedCmt[ct.dataset.cmt] = !expandedCmt[ct.dataset.cmt]; render(); return; }
+  const rv = e.target.closest('[data-rev]');
+  if(rv){ expandedRev[rv.dataset.rev] = !expandedRev[rv.dataset.rev]; render(); return; }
   const del = e.target.closest('[data-del]');
   if(del){
     const r = DATA.find(x=>x.id===del.dataset.del);
@@ -1978,9 +2032,10 @@ $('#q').addEventListener('input', ()=>{             /* 타이핑마다 60장 다
   clearTimeout(_qTimer);
   _qTimer = setTimeout(renderSoon, 140);
 });
-$('#sortDist').addEventListener('change', renderSoon);
+/* 정렬 기준은 하나만 — 한쪽을 켜면 다른 쪽은 꺼진다 */
+$('#sortDist').addEventListener('change', e=>{ if(e.target.checked) $('#sortRated').checked=false; renderSoon(); });
+$('#sortRated').addEventListener('change', e=>{ if(e.target.checked) $('#sortDist').checked=false; renderSoon(); });
 $('#radius').addEventListener('change', renderSoon);
-$('#onlyRated').addEventListener('change', renderSoon);
 $('#showAll').addEventListener('change', e=>{ showAllTiers=e.target.checked; renderSoon(); });
 $('#btnReshuffle').onclick = ()=>{
   sampleSeed = (sampleSeed*1103515245 + 12345) >>> 0;

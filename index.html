@@ -160,6 +160,11 @@
     border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;margin:14px 0 4px;
     box-shadow:var(--shadow);
   }
+  /* 이미 평가한 사람에게 보이는 접힌 한 줄 */
+  .base.folded{background:none;border:0;box-shadow:none;padding:0;margin:14px 0 4px}
+  .base.folded .vline{background:var(--brand-soft);border-color:transparent;padding:10px 12px;font-size:12.5px}
+  .base.folded .vsum{font-weight:700;color:var(--ink)}
+  .base.folded .caret{color:var(--brand)}
   .base-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
   .base-t{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
   .base-tag{font-size:11px;font-weight:800;background:var(--brand);color:#fff;padding:3px 8px;border-radius:7px}
@@ -457,7 +462,7 @@
   <div id="list"></div>
 
   <footer>
-    <p><b>판단 배지 읽는 법</b> — 교육원 구내식당을 <b>기준</b>으로 두고, 구내식당에서 식사해 본 교육생의 비교 응답(−2 ~ +2)과 이용해 보지 않은 교육생의 추천 응답을 함께 환산한 값입니다. <b>＋1.0 이상 = 나갈 만함</b>, <b>＋0.3 ~ ＋1.0 = 가볼 만함</b>, <b>±0.3 = 구내식당과 비슷</b>, <b>−0.3 미만 = 구내식당 권장</b>. 응답 3명 미만은 「표본 적음」으로 함께 표시됩니다.</p>
+    <p><b>판단 배지 읽는 법</b> — 교육원 구내식당을 <b>기준</b>으로 두고, 구내식당에서 식사해 본 교육생의 비교 응답(−2 ~ +2)을 평균한 값입니다. <b>＋1.0 이상 = 나갈 만함</b>, <b>＋0.3 ~ ＋1.0 = 가볼 만함</b>, <b>±0.3 = 구내식당과 비슷</b>, <b>−0.3 미만 = 구내식당 권장</b>. 응답 3명 미만은 「표본 적음」으로 함께 표시됩니다.</p>
     <p><b>거리 표기</b> — 도로명주소 기준 직선 추정치이며, 도보 시간은 시속 약 4.6km로 환산한 값입니다. <span class="has-route">실제 이동 시간은 [길찾기]로 확인하세요. </span><span class="no-route">신호·경사·골목길 때문에 실제로는 더 걸릴 수 있습니다. </span>점심시간 내 왕복 가능성은 거리를 기준으로 한 참고용 수치입니다.</p>
   </footer>
 </div>
@@ -538,15 +543,6 @@
       <label for="nick">내 표시 이름 (선택)</label>
       <input type="text" id="nick" placeholder="예: 9월 기본과정 김○○">
       <div class="hint">한 줄 평 옆에 표시됩니다. 비워 두면 '익명'으로 등록됩니다.</div>
-    </div>
-
-    <div class="field">
-      <label>내 구내식당 이용 경험</label>
-      <div class="opts g2" id="expToggle">
-        <button class="opt" data-exp="1">🍚 이용해 봤습니다<small style="display:block;font-weight:500;font-size:11px;opacity:.8">구내식당과 비교해서 평가</small></button>
-        <button class="opt" data-exp="0">🙅 아직 없습니다<small style="display:block;font-weight:500;font-size:11px;opacity:.8">추천 여부로 평가</small></button>
-      </div>
-      <div class="hint">경험 여부에 따라 설문 문항이 바뀝니다. 언제든 다시 바꿀 수 있습니다.</div>
     </div>
 
     <div class="panel-act">
@@ -635,7 +631,7 @@ const WALK_MIN_PER_KM = 13;     // 도보 소요 시간 환산 계수 (약 4.6km
 const CATS = ['한식','중식','일식','양식','고기·구이','분식·기타','치킨·주점','카페·디저트'];
 const CANTEEN = { id:'canteen', name:'교육원 구내식당', desc:'산업안전보건교육원 구내식당 · 모든 비교의 기준점' };
 
-/* 비교 5단계 (구내식당 경험자) */
+/* 비교 5단계 — 모든 평가는 '구내식당을 이용해 본 사람'의 비교 응답으로 통일한다 */
 const CMP_OPTS = [
   {v:-2, e:'😞', t:'훨씬 못함', tone:'bad'},
   {v:-1, e:'🙁', t:'조금 못함', tone:'warn'},
@@ -643,14 +639,8 @@ const CMP_OPTS = [
   {v: 1, e:'🙂', t:'조금 나음', tone:'good'},
   {v: 2, e:'😍', t:'훨씬 나음', tone:'good'}
 ];
-/* 추천 4단계 (구내식당 경험 없음) */
-const REC_OPTS = [
-  {v:4, e:'🌟', t:'적극 추천', tone:'good'},
-  {v:3, e:'👍', t:'추천',     tone:'good'},
-  {v:2, e:'😐', t:'보통',     tone:'warn'},
-  {v:1, e:'👎', t:'비추천',   tone:'bad'}
-];
-/* 추천 응답 → 비교 척도 환산 */
+/* 예전 '추천' 응답(4~1) → 비교 척도 환산.
+   추천 문항은 없앴지만, 이미 등록된 예전 평가가 사라지지 않도록 환산만 남겨 둔다. */
 const REC2CMP = {4:1.8, 3:0.8, 2:-0.2, 1:-1.6};
 
 const ASPECTS = [
@@ -863,16 +853,16 @@ const SEED = [
    2. 상태
    ========================================================================= */
 let DATA = [];                    // SEED + 공유 큐레이션(추가·삭제·상태) 반영본
-let REVIEWS = [];                 // {id,dev,target,targetName,exp,cmp,rec,taste,price,speed,stars,comment,who,at}
+let REVIEWS = [];                 // {id,dev,target,targetName,exp,cmp,taste,price,speed,stars,comment,who,at}
 let CURATION = { removed:{}, status:{}, added:[] };   // 목록 수정본 — Firestore meta/overrides 로 모두에게 공유
-let MY = { exp:null, nick:'' };   // exp: true(경험있음) / false(없음) / null(미응답)
+let MY = { nick:'' };             // 모든 평가는 '구내식당을 이용해 본 사람' 기준으로 통일
 let filterCat = '전체';
 let lastUpdate = null;
 let fbState = 'off';              // off | connecting | ok | cache | local | err
 const expandedRev = {};   /* 카드별 '평가 상세 펼침' 상태 */
 
 /* ── 기기 로컬 저장(localStorage): 프로필·기기ID·로컬모드 평가 ──────────
-   예전 버전은 새로고침하면 모든 상태가 사라졌다. 이제 닉네임·경험 여부·
+   예전 버전은 새로고침하면 모든 상태가 사라졌다. 이제 닉네임과
    지도 선택이 기기에 남고, Firebase 미설정 시에도 평가가 보존된다. */
 const LS = {
   get(k,d){ try{ const v=localStorage.getItem('rf_'+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
@@ -883,10 +873,9 @@ const DEV = (()=>{                 // 기기 식별자 — '식당 1곳당 1기�
   if(!d){ d = 'd'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); LS.set('dev', d); }
   return d;
 })();
-MY.exp  = LS.get('exp',  null);
 MY.nick = LS.get('nick', '');
 { const m = LS.get('map', null); if(m) MAP_PROVIDER = m; }
-function saveProfile(){ LS.set('exp', MY.exp); LS.set('nick', MY.nick); LS.set('map', MAP_PROVIDER); }
+function saveProfile(){ LS.set('nick', MY.nick); LS.set('map', MAP_PROVIDER); }
 
 /* SEED + 공유 큐레이션 → 화면에 쓰는 DATA 를 다시 만든다 */
 function rebuildData(){
@@ -1181,11 +1170,32 @@ function starStr(v){ const f=Math.round(v); return '★★★★★'.slice(0,f)+
 /* =========================================================================
    5. 렌더 – 구내식당 기준 카드
    ========================================================================= */
+let baseOpen = false;                 /* 구내식당 기준 카드 펼침 상태 */
 function renderBase(){
   const a = agg('canteen');
   const st = a.stars!=null ? a.stars : null;
+  const mine = myReviewOf('canteen');
+  const box = $('#baseCard');
+
+  /* 이미 구내식당을 평가한 사람에게는 한 줄로 접어 보여준다.
+     줄을 누르면 아래의 전체 카드가 그대로 펼쳐진다. */
+  if(mine && !baseOpen){
+    const my = mine.stars ? `${mine.stars.toFixed(1)}점` : (st!=null ? `평균 ${st.toFixed(1)}점` : '점수 없음');
+    box.className = 'base folded';
+    box.innerHTML = `
+      <button class="vline" id="baseToggle" aria-expanded="false" title="눌러서 구내식당 평가 자세히 보기">
+        <span class="vb go">교육원 평가 완료</span>
+        <span class="vsum">🏫 ${CANTEEN.name} (${my})</span>
+        <span class="vcnt">${a.n}명</span>
+        <span class="caret">▾</span>
+      </button>`;
+    box.querySelector('#baseToggle').onclick = ()=>{ baseOpen = true; renderBase(); };
+    return;
+  }
+
+  box.className = 'base';
   const dot = (fbState==='ok'||fbState==='cache') ? '<span class="dot on"></span>' : '';
-  $('#baseCard').innerHTML = `
+  box.innerHTML = `
     <div class="base-top">
       <div style="flex:1;min-width:180px">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -1194,7 +1204,7 @@ function renderBase(){
         </div>
         <div class="base-desc">${CANTEEN.desc}</div>
       </div>
-      <button class="btn sm" data-rate="canteen">⭐ 구내식당 평가하기</button>
+      <button class="btn sm" data-rate="canteen">${mine?'✏️ 내 구내식당 평가':'⭐ 구내식당 평가하기'}</button>
     </div>
     <div class="base-body">
       ${st!=null ? `
@@ -1209,8 +1219,11 @@ function renderBase(){
       ${dot?`<div class="metrics" style="margin-left:auto">${dot}실시간 공유 중</div>`:''}
     </div>
     ${a.comments.length?`<div class="cmt" style="margin-top:10px">“${esc(a.comments[0].comment)}” <span class="who">— ${esc(a.comments[0].who||'익명')} · ${ymd(a.comments[0].at)}</span></div>`:''}
+    ${mine?`<div style="text-align:center;margin-top:10px"><button class="lnk" id="baseFold">접기 ▴</button></div>`:''}
   `;
-  $('#baseCard').querySelector('[data-rate]').onclick = ()=>openRate('canteen');
+  box.querySelector('[data-rate]').onclick = ()=>openRate('canteen');
+  const fold = box.querySelector('#baseFold');
+  if(fold) fold.onclick = ()=>{ baseOpen = false; renderBase(); };
 }
 
 /* =========================================================================
@@ -1363,7 +1376,6 @@ function card(r){
   /* 평가 요약(한 줄에 들어갈 짧은 문구) */
   const bits=[];
   if(a.nCmp) bits.push(`교육원 대비 <b>${signed(a.cmpAvg)}</b>`);
-  if(a.nRec) bits.push(`추천 <b>${a.recAvg.toFixed(1)}</b>/4`);
   const brief = (bits.length ? bits.join(' · ') : '눌러서 평가 자세히 보기')
               + (few ? ' <span class="dim">· 표본 적음</span>' : '');
   const vmeta = a.n
@@ -1516,10 +1528,10 @@ function openRate(targetId){
   if(!t) return;
   const prev = myReviewOf(targetId);           /* 이미 평가한 곳이면 수정 모드로 */
   draft = prev
-    ? { target:targetId, targetName:t.name, cmp:prev.cmp, rec:prev.rec,
+    ? { target:targetId, targetName:t.name, cmp:(typeof prev.cmp==='number'?prev.cmp:null),
         taste:prev.taste||0, price:prev.price||0, speed:prev.speed||0, stars:prev.stars||0,
         comment:prev.comment||'' }
-    : { target:targetId, targetName:t.name, cmp:null, rec:null, taste:0, price:0, speed:0, stars:0, comment:'' };
+    : { target:targetId, targetName:t.name, cmp:null, taste:0, price:0, speed:0, stars:0, comment:'' };
   drawRate();
   $('#mRate').classList.add('on');
 }
@@ -1529,42 +1541,8 @@ function drawRate(){
   const t = isCanteen ? CANTEEN : DATA.find(r=>r.id===draft.target);
   const P = $('#ratePanel');
 
-  /* STEP 0 — 구내식당 경험 여부를 아직 안 물었으면 먼저 묻는다 */
-  if(MY.exp===null){
-    P.innerHTML = `
-      <h2>먼저 한 가지만 여쭙니다</h2>
-      <p class="lead">교육원 구내식당을 기준으로 비교해 드리기 위해 필요합니다. 한 번만 답하면 됩니다.</p>
-      <div class="q">
-        <h3>교육원 구내식당에서 식사해 보셨나요?</h3>
-        <p class="qs">있다면 <b>구내식당과 비교</b>해서, 없다면 <b>다른 교육생에게 추천할지</b>로 여쭤봅니다.</p>
-        <div class="opts g2">
-          <button class="opt" data-exp="1"><span class="e">🍚</span>네, 있습니다</button>
-          <button class="opt" data-exp="0"><span class="e">🙅</span>아니요, 없습니다</button>
-        </div>
-      </div>
-      <div class="panel-act"><button class="btn" data-close style="flex:1">나중에</button></div>`;
-    P.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{
-      MY.exp = b.dataset.exp==='1';
-      syncExpToggle();
-      drawRate();
-    });
-    return;
-  }
-
-  /* 구내식당 자체 평가인데 경험이 없다고 답한 경우 */
-  if(isCanteen && MY.exp===false){
-    P.innerHTML = `
-      <h2>${CANTEEN.name}</h2>
-      <p class="lead">구내식당 이용 경험이 없다고 답하셨습니다. 한 번 이용해 보신 뒤 평가해 주세요.</p>
-      <div class="note info">이용해 보셨다면 아래 버튼으로 바꿀 수 있습니다.</div>
-      <div class="panel-act">
-        <button class="btn" id="flipExp">구내식당 이용 경험 있음으로 변경</button>
-        <button class="btn primary" data-close>닫기</button>
-      </div>`;
-    P.querySelector('#flipExp').onclick = ()=>{ MY.exp=true; syncExpToggle(); drawRate(); };
-    return;
-  }
-
+  /* 평가는 '구내식당을 이용해 본 사람'의 비교 응답 하나로 통일한다.
+     (경험 여부를 묻지 않으므로 추천 문항도, 전환 문구도 없다) */
   const q1 = isCanteen ? `
     <div class="q">
       <h3>구내식당, 몇 점을 주시겠어요?</h3>
@@ -1575,22 +1553,14 @@ function drawRate(){
         <span class="val" data-val="stars"></span>
       </div>
     </div>`
-  : (MY.exp ? `
+  : `
     <div class="q">
       <h3>교육원 구내식당과 비교하면 어떠셨나요?</h3>
       <p class="qs">교육원을 벗어나 여기까지 갈 값어치가 있었는지를 기준으로 골라 주세요.</p>
       <div class="opts g5" data-grp="cmp">
         ${CMP_OPTS.map(o=>`<button class="opt" data-tone="${o.tone}" data-v="${o.v}" aria-pressed="${draft.cmp===o.v}"><span class="e">${o.e}</span>${o.t}</button>`).join('')}
       </div>
-    </div>`
-  : `
-    <div class="q">
-      <h3>다른 교육생에게 추천하시겠어요?</h3>
-      <p class="qs">구내식당 이용 경험이 없다고 하셔서, 추천 여부로 여쭙습니다.</p>
-      <div class="opts g4" data-grp="rec">
-        ${REC_OPTS.map(o=>`<button class="opt" data-tone="${o.tone}" data-v="${o.v}" aria-pressed="${draft.rec===o.v}"><span class="e">${o.e}</span>${o.t}</button>`).join('')}
-      </div>
-    </div>`);
+    </div>`;
 
   P.innerHTML = `
     <h2>${esc(t.name)} 평가</h2>
@@ -1618,9 +1588,6 @@ function drawRate(){
     <div class="panel-act">
       <button class="btn" data-close>취소</button>
       <button class="btn primary" id="btnRateSave">${myReviewOf(draft.target)?'수정 저장':'평가 등록'}</button>
-    </div>
-    <div style="text-align:center;margin-top:10px">
-      <button class="lnk" id="flipExp2">${MY.exp?'구내식당 이용 경험 없음으로 변경':'구내식당 이용 경험 있음으로 변경'}</button>
     </div>`;
 
   /* 선택지 */
@@ -1646,7 +1613,6 @@ function drawRate(){
     };
     paint();
   });
-  P.querySelector('#flipExp2').onclick = ()=>{ MY.exp = !MY.exp; syncExpToggle(); drawRate(); };
   P.querySelector('#btnRateSave').onclick = saveRate;
 }
 
@@ -1655,8 +1621,7 @@ async function saveRate(){
   if(_saving) return;                                  /* 더블탭 중복 등록 방지 */
   const isCanteen = draft.target==='canteen';
   if(isCanteen && !draft.stars){ alert('전체 만족도 별점을 선택해 주세요.'); return; }
-  if(!isCanteen && MY.exp && draft.cmp===null){ alert('구내식당과 비교한 결과를 선택해 주세요.'); return; }
-  if(!isCanteen && !MY.exp && draft.rec===null){ alert('추천 여부를 선택해 주세요.'); return; }
+  if(!isCanteen && draft.cmp===null){ alert('구내식당과 비교한 결과를 선택해 주세요.'); return; }
 
   const who = ($('#who').value||'').trim().slice(0,40);
   MY.nick = who; saveProfile();
@@ -1666,9 +1631,9 @@ async function saveRate(){
     dev: DEV,
     target: draft.target,
     targetName: draft.targetName,
-    exp: !!MY.exp,
-    cmp: (!isCanteen && MY.exp) ? draft.cmp : null,
-    rec: (!isCanteen && !MY.exp) ? draft.rec : null,
+    exp: true,                                         /* 모든 평가는 구내식당 이용 경험자 기준 */
+    cmp: isCanteen ? null : draft.cmp,
+    rec: null,                                         /* 추천 문항 폐지 — 예전 데이터 호환용 자리만 유지 */
     stars: isCanteen ? draft.stars : (draft.stars||null),
     taste: draft.taste||null, price: draft.price||null, speed: draft.speed||null,
     comment: ($('#cmt').value||'').trim().slice(0,500),
@@ -1690,10 +1655,6 @@ async function saveRate(){
     :                  '<span class="y">✓ 이 기기에 저장되었습니다. (공유 서버 미설정)</span>';
   render();
   setTimeout(closeAll, how==='shared' ? 800 : 1600);
-}
-
-function syncExpToggle(){
-  $$('#expToggle .opt').forEach(b=>b.setAttribute('aria-pressed', MY.exp!==null && (b.dataset.exp==='1')===MY.exp));
 }
 
 /* =========================================================================
@@ -2053,7 +2014,7 @@ $('#mapProviderToggle').onclick = e=>{
   MAP_PROVIDER=b.dataset.prov; saveProfile(); syncProviderToggle(); render();
   toast(`길찾기를 ${ro(providerLabel())} 엽니다`);
 };
-$('#btnSetup').onclick = ()=>{ $('#nick').value=MY.nick; $('#fbStat').innerHTML=fbStatText()+(FB_CFG?` · 프로젝트 <b>${esc(FB_CFG.projectId)}</b>`:' · index.html 상단 FIREBASE_CONFIG 를 채워 주세요'); syncExpToggle(); syncProviderToggle(); open('#mSetup'); };
+$('#btnSetup').onclick = ()=>{ $('#nick').value=MY.nick; $('#fbStat').innerHTML=fbStatText()+(FB_CFG?` · 프로젝트 <b>${esc(FB_CFG.projectId)}</b>`:' · index.html 상단 FIREBASE_CONFIG 를 채워 주세요'); syncProviderToggle(); open('#mSetup'); };
 $('#btnAdd').onclick = ()=>{ $('#aCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join(''); open('#mAdd'); };
 
 $$('.tab').forEach(t=>t.onclick=()=>{
@@ -2099,10 +2060,6 @@ $('#mgFile').onchange = e=>{ if(e.target.files.length) migrateFiles([...e.target
 
 $('#nick').addEventListener('change', e=>{ MY.nick=e.target.value.trim(); saveProfile(); });
 $$('[data-copy-origin]').forEach(b=>b.onclick = ()=>copyOrigin());
-$('#expToggle').onclick = e=>{
-  const b=e.target.closest('[data-exp]'); if(!b) return;
-  MY.exp=b.dataset.exp==='1'; saveProfile(); syncExpToggle(); render();
-};
 $('#btnAdminOff').onclick = ()=>{
   LS.set('admin', false); document.body.classList.remove('admin');
   closeAll(); toast('관리자 모드를 껐습니다');

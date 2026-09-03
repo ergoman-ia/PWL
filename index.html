@@ -333,6 +333,8 @@
   .q{margin-bottom:18px}
   .q h3{margin:0 0 3px;font-size:14px;letter-spacing:-.2px}
   .q .qs{font-size:12px;color:var(--ink3);margin:0 0 9px;line-height:1.5}
+  .multi-note{font-size:12px;color:color-mix(in srgb, var(--bad) 62%, transparent);margin:0 0 9px;line-height:1.5}
+  .panel .lead + .multi-note{margin:-10px 0 16px}
   .opts{display:grid;gap:6px}
   .opts.g5{grid-template-columns:repeat(5,1fr)}
   .opts.g4{grid-template-columns:repeat(2,1fr)}
@@ -1578,6 +1580,7 @@ function drawRate(){
     <div class="q">
       <h3>교육원 구내식당과 비교하면 어떠셨나요?</h3>
       <p class="qs">교육원을 벗어나 여기까지 갈 값어치가 있었는지를 기준으로 골라 주세요.</p>
+      <p class="multi-note">모든 식당은 악의적 목적이 아니라면 여러 번 평가할 수 있습니다.</p>
       <div class="opts g5" data-grp="cmp">
         ${CMP_OPTS.map(o=>`<button class="opt" data-tone="${o.tone}" data-v="${o.v}" aria-pressed="${draft.cmp===o.v}"><span class="e">${o.e}</span>${o.t}</button>`).join('')}
       </div>
@@ -1586,6 +1589,7 @@ function drawRate(){
   P.innerHTML = `
     <h2>${esc(t.name)} 평가</h2>
     <p class="lead">${isCanteen ? '교육원 구내식당' : `기준점에서 ${distLabel(t.dist)} · ${esc(t.category)}`}</p>
+    ${isCanteen ? '<p class="multi-note">모든 식당은 악의적 목적이 아니라면 여러 번 평가할 수 있습니다.</p>' : ''}
     ${q1}
     <div class="q">
       <h3>항목별 점수 <span style="font-weight:500;color:var(--ink3);font-size:12px">(선택)</span></h3>
